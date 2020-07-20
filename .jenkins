@@ -1,0 +1,36 @@
+#!/usr/bin/env groovy
+
+// Include this shared CI repository to load script helpers and libraries.
+library identifier: 'vapor@master', retriever: modernSCM([
+  $class: 'GitSCMSource',
+  remote: 'https://github.com/vapor-ware/ci-shared.git',
+  credentialsId: 'vio-bot-gh',
+])
+
+
+// Declared in vapor-ware/ci-shared/vars/toxPipeline.groovy
+toxPipeline([
+  "releaseToPypi": true,
+  "twineCredential": "pypi-token-containerlog-upload",
+  "podTemplate": """
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    jenkins/job: containerlog
+spec:
+  containers:
+  - name: python
+    image: vaporio/jenkins-agent-python38:latest
+    command:
+    - cat
+    tty: true
+  nodeSelector:
+    cloud.google.com/gke-nodepool: jenkins
+  tolerations:
+  - key: role
+    operator: Equal
+    value: jenkins
+    effect: NoSchedule
+"""
+])
