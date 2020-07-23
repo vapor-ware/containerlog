@@ -21,6 +21,12 @@ the Python standard logger
 Not every application needs optimized logging, but where latency and performance matters,
 `containerlog` could work for you.
 
+```
+timestamp='2020-07-23T13:11:28.009804Z' logger='my-logger' level='debug' event='loading configuration' path='./config.yaml'
+timestamp='2020-07-23T13:11:28.010137Z' logger='my-logger' level='info' event='starting application' 
+timestamp='2020-07-23T13:11:28.010158Z' logger='my-logger' level='warn' event='having too much fun' countdown=[3, 2, 1]
+```
+
 ## Installation
 
 `containerlog` can be installed with pip:
