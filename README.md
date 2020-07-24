@@ -176,17 +176,18 @@ can be found below.
 Benchmarks were measured using Python 3.8.0 on macOS 10.15.1 with a 2.9 GHz 6-Core Intel Core i9
 processor and 16 GB 2400 MHz DDR4 memory.
 
-![containerlog 0.1.0](benchmarks/results/benchmark-containerlog-0.1.0.png)
+![containerlog 0.2.0](benchmarks/results/benchmark-containerlog-0.2.0.png)
 
-| Benchmark | std logger (ns) | containerlog (ns) |
-| --------- | --------------- | ----------------- |
-| baseline | 0.68 +/- 0.02 | 0.69 +/- 0.02 |
-| silent | 110.0 +/- 6.0 | 57.8 +/- 1.4 |
-| basic | 4720.0 +/- 220.0 | 1040.0 +/- 50.0 |
-| short-simple | 5310.0 +/- 170.0 | 1240.0 +/- 60.0 |
-| long-simple | 5180.0 +/- 190.0 | 2029.9999999999998 +/- 70.0 |
-| short-complex | 5580.0 +/- 270.0 | 1430.0 +/- 90.0 |
-| long-complex | 6800.0 +/- 200.0 | 3140.0 +/- 80.0 |
+| Benchmark | std logger (ns) | std proxy (ns) | containerlog (ns) |
+| --------- | --------------- | -------------- | ----------------- |
+| baseline | 0.64 +/- 0.01 | 0.64 +/- 0.01 | 0.65 +/- 0.01 |
+| silent | 102.0 +/- 3.0 | 1120.0 +/- 40.0 | 56.2 +/- 1.3 |
+| basic | 4550.0 +/- 160.0 | 1130.0 +/- 40.0 | 1030.0 +/- 30.0 |
+| short-simple | 5090.0 +/- 120.0 | 1300.0 +/- 60.0 | 1250.0 +/- 70.0 |
+| long-simple | 5040.0 +/- 170.0 | 1440.0 +/- 60.0 | 2020.0 +/- 70.0 |
+| short-complex | 5430.0 +/- 200.0 | 1450.0 +/- 60.0 | 1370.0 +/- 50.0 |
+| long-complex | 6590.0 +/- 140.0 | 2770.0 +/- 60.0 | 3160.0 +/- 100.0 |
+| exception | 10000.0 +/- 400.0 | 4330.0 +/- 120.0 | 4050.0 +/- 170.0 |
 
 ## Contribute
 
