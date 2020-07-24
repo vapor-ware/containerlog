@@ -14,7 +14,7 @@ from typing import Dict, Optional
 
 # Project attributes
 __title__ = 'containerlog'
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 __description__ = 'Optimized, opinionated structured logging for containerized applications.'
 __author__ = 'Erick Daniszewski'
 __author_email__ = 'erick@vapor.io'
