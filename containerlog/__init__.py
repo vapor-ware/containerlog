@@ -8,6 +8,8 @@ container.
 import datetime
 import inspect
 import sys
+import io
+import traceback
 from typing import Dict, Optional
 
 # Project attributes
@@ -74,7 +76,7 @@ class Logger:
         """
         self.level = 99
 
-    def _log(self, loglevel: int, msg: str, **kwargs) -> None:
+    def _log(self, loglevel: int, msg: str, exc: bool = False, **kwargs) -> None:
         """Log a message to console.
 
         The underlying log function. All higher-level convenience methods
@@ -83,6 +85,7 @@ class Logger:
         Args:
             loglevel: The level to log the message at.
             msg: The message to log.
+            exc: Whether or not to include an exception traceback.
             **kwargs: Additional structured data to add to the log entry.
         """
         # Since log message are output in the format: event='message', any single
@@ -117,6 +120,16 @@ class Logger:
         # Format the log message entry.
         extras = ' '.join(f"{k}={fmt_val(v)}" for k, v in kwargs.items())
         entry = f"timestamp='{self.utcnow().isoformat('T')}Z' logger='{self.name}' level='{self._level_lookup[loglevel]}' event='{msg}' {extras}\n"  # noqa
+
+        if exc:
+            exc_info = sys.exc_info()
+            buf = io.StringIO()
+            traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], None, buf)
+            s = buf.getvalue()
+            buf.close()
+            if s[-1] != '\n':
+                s += '\n'
+            entry += s
 
         # Log to stderr if at level error or greater, otherwise log to stdout.
         (loglevel >= 4 and self.writeerr(entry)) or self.writeout(entry)
@@ -176,6 +189,15 @@ class Logger:
             **kwargs: Additional structured data to add to the log entry.
         """
         self.level <= 5 and self._log(5, msg, **kwargs)
+
+    def exception(self, msg, **kwargs):
+        """Log a message at ERROR level with an exception stack trace.
+
+        Args:
+            msg: The message to log.
+            **kwargs: Additional structured data to add to the log entry.
+        """
+        self.level <= 4 and self._log(4, msg, exc=True, **kwargs)
 
 
 class Manager:
