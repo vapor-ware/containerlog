@@ -71,40 +71,54 @@ def normalize_data(data: List[str]) -> Dict[str, Tuple[float, float]]:
     return results
 
 
-def make_table(version: str, std: Dict[str, Tuple[float, float]], cntr: Dict[str, Tuple[float, float]]):
+def make_table(
+    version: str,
+    std: Dict[str, Tuple[float, float]],
+    cntr: Dict[str, Tuple[float, float]],
+    std_proxy: Dict[str, Tuple[float, float]],
+):
     """Generate a markdown table for the provided benchmark data.
 
     Args:
         version: The version of containerlog that is being tested.
         std: Normalized data from benchmarking the Python standard logger.
-        cntr: Normalized data from benchmarking the containerlog.
+        cntr: Normalized data from benchmarking the containerlog logger.
+        std_proxy: Normalized data from benchmarking the StdLoggerProxy logger.
     """
     assert std.keys() == cntr.keys(), f'std={std.keys()} cntr={cntr.keys()}'
 
     rows = [
-        '| Benchmark | std logger (ns) | containerlog (ns) |',
-        '| --------- | --------------- | ----------------- |',
+        '| Benchmark | std logger (ns) | std proxy (ns) | containerlog (ns) |',
+        '| --------- | --------------- | -------------- | ----------------- |',
     ]
     for k in std.keys():
-        rows.append(f'| {k} | {std[k][0]} +/- {std[k][1]} | {cntr[k][0]} +/- {cntr[k][1]} |')
+        rows.append(f'| {k} | {std[k][0]} +/- {std[k][1]} | {std_proxy[k][0]} +/- {std_proxy[k][1]} | {cntr[k][0]} +/- {cntr[k][1]} |')
 
     with open(f'benchmark-containerlog-{version}.md', 'w') as f:
         f.write('\n'.join(rows))
 
 
-def make_plot(version: str, std: Dict[str, Tuple[float, float]], cntr: Dict[str, Tuple[float, float]]):
+def make_plot(
+    version: str,
+    std: Dict[str, Tuple[float, float]],
+    cntr: Dict[str, Tuple[float, float]],
+    std_proxy: Dict[str, Tuple[float, float]],
+):
     """Generate a plot for the provided benchmark data.
 
     Args:
         version: The version of containerlog that is being tested.
         std: Normalized data from benchmarking the Python standard logger.
-        cntr: Normalized data from benchmarking the containerlog.
+        cntr: Normalized data from benchmarking the containerlog logger.
+        std_proxy: Normalized data from benchmarking the StdLoggerProxy logger.
     """
     assert std.keys() == cntr.keys(), f'std={std.keys()} cntr={cntr.keys()}'
 
     labels = list(std.keys())
     std_means = [std[k][0] for k in labels]
     std_err = [std[k][1] for k in labels]
+    std_proxy_means = [std_proxy[k][0] for k in labels]
+    std_proxy_err = [std_proxy[k][1] for k in labels]
     cntr_means = [cntr[k][0] for k in labels]
     cntr_err = [cntr[k][1] for k in labels]
 
@@ -112,8 +126,9 @@ def make_plot(version: str, std: Dict[str, Tuple[float, float]], cntr: Dict[str,
     width = 0.25
 
     fig, ax = plt.subplots()
-    ax.bar(list(map(lambda i: i - width / 2, x)), std_means, width, yerr=std_err, label='std logger')
-    ax.bar(list(map(lambda i: i + width / 2, x)), cntr_means, width, yerr=cntr_err, label='containerlog')
+    ax.bar(list(map(lambda i: i - width, x)), std_means, width, yerr=std_err, label='std logger')
+    ax.bar(list(map(lambda i: i, x)), std_proxy_means, width, yerr=std_proxy_err, label='std proxy')
+    ax.bar(list(map(lambda i: i + width, x)), cntr_means, width, yerr=cntr_err, label='containerlog')
 
     ax.set_ylabel('execution time (ns)')
     ax.set_title(f'Benchmark results for containerlog v{version}')
@@ -142,10 +157,14 @@ if __name__ == '__main__':
     with open('containerlog_results.txt', 'r') as f:
         containerlog_results = f.readlines()
 
+    with open('std_proxy_results.txt', 'r') as f:
+        std_proxy_results = f.readlines()
+
     # Normalize the output data from file.
     norm_std = normalize_data(std_results)
     norm_containerlog = normalize_data(containerlog_results)
+    norm_std_proxy = normalize_data(std_proxy_results)
 
     # Generate the output artifacts.
-    make_table(containerlog_version, norm_std, norm_containerlog)
-    make_plot(containerlog_version, norm_std, norm_containerlog)
+    make_table(containerlog_version, norm_std, norm_containerlog, norm_std_proxy)
+    make_plot(containerlog_version, norm_std, norm_containerlog, norm_std_proxy)

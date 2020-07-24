@@ -15,16 +15,20 @@ python benchmark_std.py > std_results.txt
 echo "  • benchmark containerlog"
 python benchmark_containerlog.py > containerlog_results.txt
 
-echo "  • generating plot"
+echo "  • benchmark std proxy"
+python benchmark_std_proxy.py > std_proxy_results.txt
+
+echo "  • generating artifacts"
 python plot.py "${containerlog_version}"
 retVal=$?
 if [ $retVal -ne 0 ]; then
     echo "Error"
-    return 1
+    exit 1
 fi
 
 rm std_results.txt
 rm containerlog_results.txt
+rm std_proxy_results.txt
 
 echo ""
 echo "Done. The following artifacts have been generated:"
