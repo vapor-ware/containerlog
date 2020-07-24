@@ -4,6 +4,7 @@ import fnmatch
 import logging
 import sys
 from logging import Logger
+from types import ModuleType
 
 import containerlog
 
@@ -94,11 +95,14 @@ def _patch_logger(name: str) -> None:
     if std:
         # This really is Schrödinger's code here.. I am simultaneously
         # deeply ashamed and proud of it.
-        for mod_name, mod in sys.modules.items():
+        for mod_name in list(sys.modules.keys()):
+            mod = sys.modules[mod_name]
             if mod_name not in sys.builtin_module_names:
-                for module_member_name, module_member in mod.__dict__.items():
-                    if module_member is std:
-                        mod.__dict__[module_member_name] = new_log
+                if isinstance(mod, ModuleType):
+                    for module_member_name, module_member in mod.__dict__.items():
+                        if module_member is std:
+                            new_log.setLevel(module_member.level)
+                            mod.__dict__[module_member_name] = new_log
 
     # After patching the logging.Logger instance globally, patch it out
     # of the logging.Manager.
@@ -146,6 +150,10 @@ class StdLoggerProxy(Logger):
     def __init__(self, name: str) -> None:
         self.containerlog = containerlog.get_logger(name)
         super(StdLoggerProxy, self).__init__(name)
+
+    def setLevel(self, level: int) -> None:
+        self.level = level
+        self.containerlog.level = _map_level(level)
 
     @property
     def writeout(self):
