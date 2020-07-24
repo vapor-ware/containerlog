@@ -147,6 +147,22 @@ class StdLoggerProxy(Logger):
         self.containerlog = containerlog.get_logger(name)
         super(StdLoggerProxy, self).__init__(name)
 
+    @property
+    def writeout(self):
+        return self.containerlog.writeout
+
+    @writeout.setter
+    def writeout(self, fn):
+        self.containerlog.writeout = fn
+
+    @property
+    def writeerr(self):
+        return self.containerlog.writeerr
+
+    @writeerr.setter
+    def writeerr(self, fn):
+        self.containerlog.writeerr = fn
+
     def debug(self, msg, *args, **kwargs):
         """Log a message at DEBUG level."""
         extras = {}
