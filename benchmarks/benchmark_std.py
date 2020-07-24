@@ -172,6 +172,27 @@ def bench_long_complex(loops, logger):
     return pyperf.perf_counter() - t0
 
 
+def bench_exception(loops, logger):
+    # use fast local vars
+    m = MSG_BASIC
+    range_loops = range(loops)
+    t0 = pyperf.perf_counter()
+
+    for _ in range_loops:
+        logger.exception(m)
+        logger.exception(m)
+        logger.exception(m)
+        logger.exception(m)
+        logger.exception(m)
+        logger.exception(m)
+        logger.exception(m)
+        logger.exception(m)
+        logger.exception(m)
+        logger.exception(m)
+
+    return pyperf.perf_counter() - t0
+
+
 BENCHMARKS = {
     'baseline': bench_baseline,
     'silent': bench_silent,
@@ -180,6 +201,7 @@ BENCHMARKS = {
     'long-simple': bench_long_simple,
     'short-complex': bench_short_complex,
     'long-complex': bench_long_complex,
+    'exception': bench_exception,
 }
 
 
