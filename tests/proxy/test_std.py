@@ -1,11 +1,13 @@
 """Unit tests for containerlog's StdLoggerProxy."""
 
-import pytest
 import logging
+import sys
+from unittest import mock
+
+import pytest
+
 import containerlog
 from containerlog.proxy import std
-from unittest import mock
-import sys
 
 
 class TestStdLoggerProxy:

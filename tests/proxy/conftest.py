@@ -1,10 +1,12 @@
 """Test fixtures for containerlog proxy tests."""
 
-import pytest
-import logging
-import io
-from containerlog.proxy import std
 import datetime
+import io
+import logging
+
+import pytest
+
+from containerlog.proxy import std
 
 
 @pytest.fixture()

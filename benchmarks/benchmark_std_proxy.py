@@ -1,9 +1,10 @@
 """Logging benchmarks for containerlog's proxy for the standard logger."""
 
 import io
-import containerlog.proxy.std
 
 import pyperf
+
+import containerlog.proxy.std
 
 
 class Custom:
