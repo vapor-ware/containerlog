@@ -28,5 +28,8 @@ test:  ## Run the project unit tests
 version:  ## Print the package version
 	@echo "${PKG_VERSION}"
 
+.PHONY: unit-test
+unit-test: test
+
 help:  ## Print usage information
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9_-]+:.*?## / {printf "\033[36m%-16s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
