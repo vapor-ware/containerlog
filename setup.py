@@ -33,7 +33,11 @@ setup(
     author=pkg['__author__'],
     author_email=pkg['__author_email__'],
     packages=find_packages(),
-    package_data={'': ['LICENSE']},
+    package_data={
+        '': ['LICENSE'],
+        'containerlog': ['py.typed'],
+    },
+    include_package_data=True,
     python_requires='>=3.6',
     install_requires=[],
     classifiers=[
@@ -43,5 +47,4 @@ setup(
         'Operating System :: OS Independent',
     ],
     zip_safe=False,
-    include_package_data=True,
 )
