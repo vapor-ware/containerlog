@@ -5,6 +5,7 @@ import logging
 import sys
 from logging import Logger
 from types import ModuleType
+from typing import Union
 
 import containerlog
 
@@ -50,7 +51,7 @@ def patch(*loggers: str) -> None:
         _patch_all()
     else:
         for logger_glob in loggers:
-            filtered = fnmatch.filter(Logger.manager.loggerDict.keys(), logger_glob)
+            filtered = fnmatch.filter(Logger.manager.loggerDict.keys(), logger_glob)  # type: ignore
             for name in filtered:
                 _patch_logger(name)
 
@@ -65,12 +66,12 @@ def _patch_all() -> None:
     # ensures that any new loggers loaded later on (e.g. if they were initialized
     # as a logging.PlaceHolder) are loaded as this proxy class and not the regular
     # logging.Logger.
-    Logger.manager.loggerClass = StdLoggerProxy
+    Logger.manager.loggerClass = StdLoggerProxy  # type: ignore
 
     # Replace all already initialized Logger instances with their corresponding
     # StdLoggerProxy.
-    for name in Logger.manager.loggerDict.keys():
-        logger = Logger.manager.loggerDict[name]
+    for name in Logger.manager.loggerDict.keys():  # type: ignore
+        logger = Logger.manager.loggerDict[name]  # type: ignore
 
         # Need to check that it is a Logger, as it may be a PlaceHolder.
         if isinstance(logger, logging.Logger):
@@ -78,7 +79,7 @@ def _patch_all() -> None:
 
             new_logger = StdLoggerProxy(name)
             new_logger.level = level
-            Logger.manager.loggerDict[name] = new_logger
+            Logger.manager.loggerDict[name] = new_logger  # type: ignore
 
 
 def _patch_logger(name: str) -> None:
@@ -106,10 +107,10 @@ def _patch_logger(name: str) -> None:
 
     # After patching the logging.Logger instance globally, patch it out
     # of the logging.Manager.
-    Logger.manager.loggerDict[name] = new_log
+    Logger.manager.loggerDict[name] = new_log  # type: ignore
 
 
-def _map_level(level: int) -> int:
+def _map_level(level: Union[int, str]) -> int:
     """Map the logging level to the containerlog level.
 
     Note: If a package is using custom levels, we have no way to
@@ -124,6 +125,7 @@ def _map_level(level: int) -> int:
     Returns:
         The corresponding containerlog log level.
     """
+    level = _normalize_level(level)
     return {
         logging.DEBUG: containerlog.DEBUG,
         logging.INFO: containerlog.INFO,
@@ -132,6 +134,27 @@ def _map_level(level: int) -> int:
         logging.CRITICAL: containerlog.CRITICAL,
         logging.NOTSET: 99,  # effective disabled
     }.get(level, 90)
+
+
+def _normalize_level(level: Union[str, int]) -> int:
+    """Normalize the logging level which may be a string or int to its
+    integer representation.
+
+    Args:
+        level: The logging level to normalize.
+
+    Returns:
+        The corresponding integer log level.
+    """
+    if isinstance(level, int):
+        rv = level
+    elif str(level) == level:
+        if level.upper() not in logging._nameToLevel:
+            raise ValueError(f'Unknown logging level: {level}')
+        rv = logging._nameToLevel[level.upper()]
+    else:
+        raise TypeError(f'Level not an integer or a valid string: {level}')
+    return rv
 
 
 class StdLoggerProxy(Logger):
@@ -151,8 +174,8 @@ class StdLoggerProxy(Logger):
         self.containerlog = containerlog.get_logger(name)
         super(StdLoggerProxy, self).__init__(name)
 
-    def setLevel(self, level: int) -> None:
-        self.level = level
+    def setLevel(self, level: Union[int, str]) -> None:
+        self.level = _normalize_level(level)
         self.containerlog.level = _map_level(level)
 
     @property
