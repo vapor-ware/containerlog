@@ -10,7 +10,7 @@ library identifier: 'vapor@1.0.0-RC6', retriever: modernSCM([
 pythonPipeline([
   'pythonVersion': '3.8',
   'twineCredential': 'pypi-token-containerlog-upload',
-  'releaseToPypi': true,
+  'publishToPypi': true,
   'publishToGitHub': true,
   'skipIntegrationTest': true,
   'skipDocker': true,
