@@ -6,6 +6,7 @@ container.
 """
 
 import datetime
+import fnmatch
 import inspect
 import io
 import sys
@@ -57,8 +58,9 @@ class Logger:
     }
 
     def __init__(self, name: str, level: Optional[int] = None) -> None:
-        self.name = name
-        self.level = level or DEBUG
+        self.name: str = name
+        self.level: int = DEBUG if level is None else level
+        self._previous_level: Optional[int] = None
 
         # Proxy module functions being used into the class scope. This
         # speeds things up by making what would otherwise be a LOAD_GLOBAL
@@ -67,6 +69,11 @@ class Logger:
         self.writeout = sys.stdout.write
         self.writeerr = sys.stderr.write
 
+    @property
+    def disabled(self) -> bool:
+        """Check whether or not the Logger is disabled."""
+        return self.level == 99
+
     def disable(self) -> None:
         """Disable the logger.
 
@@ -74,7 +81,19 @@ class Logger:
         any additional code paths by setting the log level to something higher
         than the supported log levels.
         """
-        self.level = 99
+        if self.level != 99:
+            self._previous_level = self.level
+            self.level = 99
+
+    def enable(self) -> None:
+        """Enable the logger.
+
+        If the logger is already configured for a known logging level, this does nothing.
+        Otherwise, it moves the logger from its "disabled" state back to its previously
+        known log level.
+        """
+        if self.level > 5:  # 5 = critical, highest log level
+            self.level = DEBUG if self._previous_level is None else self._previous_level
 
     def _log(self, loglevel: int, msg: str, exc: bool = False, **kwargs) -> None:
         """Log a message to console.
@@ -292,3 +311,63 @@ def get_logger(name: Optional[str] = None) -> Logger:
         manager.loggers[name] = logger
 
     return logger
+
+
+def disable(*loggers: str) -> None:
+    """Disable the loggers whose name matches the specified string(s) or glob(s).
+
+    Loggers may be specified explicitly by name, e.g. 'foo', or using a
+    glob match, e.g. 'foo.*'. Specified loggers will be updated in the
+    logger.Manager.
+
+    If no loggers are specified, this will disable all loggers currently tracked
+    within the logging.Manager, and the manager log level will be set to the
+    disabled level so all future instantiated loggers are disabled.
+
+    The effects of this can be revered by calling `containerlog.enable()` with
+    the same set of arguments, e.g. `enable()` reverses `disable()`,
+    `enable('foo', 'bar')` reverses `disable('foo', 'bar')`.
+
+    Args:
+        loggers: The string or glob-names of the loggers to disable. This may
+            be left unspecified to disable all loggers.
+    """
+    if len(loggers) == 0:
+        for logger in manager.loggers.values():
+            logger.disable()
+    else:
+        for glob in loggers:
+            filtered = fnmatch.filter(manager.loggers.keys(), glob)
+            for name in filtered:
+                manager.loggers[name].disable()
+
+
+def enable(*loggers: str) -> None:
+    """Enable the loggers whose name matches the specified string(s) or glob(s).
+
+    Loggers may be specified explicitly by name, e.g. 'foo', or using a
+    glob match, e.g. 'foo.*'. Specified loggers will be updated in the
+    logger.Manager.
+
+    If a logger is already enabled, no changes are made to it or its log level.
+
+    If no loggers are specified, this will enable all loggers currently tracked
+    within the logging.Manager. If previously globally disabled, this will also
+    revert the manager to the last set log level value.
+
+    The effects of this can be revered by calling `containerlog.disable()` with
+    the same set of arguments, e.g. `disable()` reverses `enable()`,
+    `disable('foo', 'bar')` reverses `enable('foo', 'bar')`.
+
+    Args:
+        loggers: The string or glob-names of the loggers to enable. This may
+            be left unspecified to enable all loggers.
+    """
+    if len(loggers) == 0:
+        for logger in manager.loggers.values():
+            logger.enable()
+    else:
+        for glob in loggers:
+            filtered = fnmatch.filter(manager.loggers.keys(), glob)
+            for name in filtered:
+                manager.loggers[name].enable()
