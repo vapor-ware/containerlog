@@ -49,18 +49,88 @@ class TestLogger:
         logger = containerlog.Logger(name='test', level=containerlog.INFO)
         assert logger.name == 'test'
         assert logger.level == containerlog.INFO
+        assert logger._previous_level is None
 
     def test_init_default_level(self):
         logger = containerlog.Logger(name='test')
         assert logger.name == 'test'
         assert logger.level == containerlog.DEBUG
+        assert logger._previous_level is None
 
     def test_disable(self):
         logger = containerlog.Logger(name='test')
         assert logger.level == containerlog.DEBUG
+        assert logger._previous_level is None
 
         logger.disable()
         assert logger.level == 99
+        assert logger._previous_level == containerlog.DEBUG
+
+    def test_disable_already_disabled(self):
+        logger = containerlog.Logger(name='test')
+        assert logger.level == containerlog.DEBUG
+        assert logger._previous_level is None
+
+        logger.disable()
+        assert logger.level == 99
+        assert logger._previous_level == containerlog.DEBUG
+
+        logger.disable()
+        assert logger.level == 99
+        assert logger._previous_level == containerlog.DEBUG
+
+    @pytest.mark.parametrize(
+        'loglevel',
+        [
+            containerlog.TRACE,
+            containerlog.DEBUG,
+            containerlog.INFO,
+            containerlog.WARN,
+            containerlog.ERROR,
+            containerlog.CRITICAL,
+        ],
+    )
+    def test_enable_from_disabled(self, loglevel):
+        logger = containerlog.Logger(name='test', level=loglevel)
+        assert logger.level == loglevel
+        assert logger._previous_level is None
+
+        logger.disable()
+        assert logger.level == 99
+        assert logger._previous_level == loglevel
+
+        logger.enable()
+        assert logger.level == loglevel
+        assert logger._previous_level == loglevel
+
+    @pytest.mark.parametrize(
+        'loglevel',
+        [
+            containerlog.TRACE,
+            containerlog.DEBUG,
+            containerlog.INFO,
+            containerlog.WARN,
+            containerlog.ERROR,
+            containerlog.CRITICAL,
+        ],
+    )
+    def test_enable_already_enabled(self, loglevel):
+        logger = containerlog.Logger(name='test', level=loglevel)
+        assert logger.level == loglevel
+        assert logger._previous_level is None
+
+        logger.enable()
+        assert logger.level == loglevel
+        assert logger._previous_level is None
+
+    def test_disabled_false(self):
+        logger = containerlog.Logger(name='test')
+        assert logger.disabled is False
+
+    def test_disabled_true(self):
+        logger = containerlog.Logger(name='test')
+        logger.disable()
+        assert logger.disabled is True
 
     @pytest.mark.parametrize(
         'loglevel,msg,kwargs,out,err',
@@ -316,3 +386,87 @@ def test_set_level():
     assert containerlog.manager.level == containerlog.ERROR
     for logger in containerlog.manager.loggers.values():
         assert logger.level == containerlog.ERROR
+
+
+def test_disable_glob():
+    loggers = {
+        'test': containerlog.Logger('test'),
+        'foo': containerlog.Logger('foo'),
+        'foo.bar': containerlog.Logger('foo.bar'),
+        'other': containerlog.Logger('other', level=99)
+    }
+
+    containerlog.manager.loggers = loggers
+    containerlog.disable('foo*', 'other')
+
+    assert loggers['test'].level == containerlog.DEBUG
+    assert loggers['test'].disabled is False
+    assert loggers['foo'].level == 99
+    assert loggers['foo'].disabled is True
+    assert loggers['foo.bar'].level == 99
+    assert loggers['foo.bar'].disabled is True
+    assert loggers['other'].level == 99
+    assert loggers['other'].disabled is True
+
+
+def test_disable_all():
+    loggers = {
+        'test': containerlog.Logger('test'),
+        'foo': containerlog.Logger('foo'),
+        'foo.bar': containerlog.Logger('foo.bar'),
+        'other': containerlog.Logger('other', level=99)
+    }
+
+    containerlog.manager.loggers = loggers
+    containerlog.disable()
+
+    assert loggers['test'].level == 99
+    assert loggers['test'].disabled is True
+    assert loggers['foo'].level == 99
+    assert loggers['foo'].disabled is True
+    assert loggers['foo.bar'].level == 99
+    assert loggers['foo.bar'].disabled is True
+    assert loggers['other'].level == 99
+    assert loggers['other'].disabled is True
+
+
+def test_enable_glob():
+    loggers = {
+        'test': containerlog.Logger('test', level=99),
+        'foo': containerlog.Logger('foo', level=99),
+        'foo.bar': containerlog.Logger('foo.bar', level=containerlog.INFO),
+        'other': containerlog.Logger('other', level=99)
+    }
+
+    containerlog.manager.loggers = loggers
+    containerlog.enable('foo*', 'other')
+
+    assert loggers['test'].level == 99
+    assert loggers['test'].disabled is True
+    assert loggers['foo'].level == containerlog.DEBUG
+    assert loggers['foo'].disabled is False
+    assert loggers['foo.bar'].level == containerlog.INFO
+    assert loggers['foo.bar'].disabled is False
+    assert loggers['other'].level == containerlog.DEBUG
+    assert loggers['other'].disabled is False
+
+
+def test_enable_all():
+    loggers = {
+        'test': containerlog.Logger('test', level=99),
+        'foo': containerlog.Logger('foo', level=99),
+        'foo.bar': containerlog.Logger('foo.bar', level=containerlog.INFO),
+        'other': containerlog.Logger('other', level=99)
+    }
+
+    containerlog.manager.loggers = loggers
+    containerlog.enable()
+
+    assert loggers['test'].level == containerlog.DEBUG
+    assert loggers['test'].disabled is False
+    assert loggers['foo'].level == containerlog.DEBUG
+    assert loggers['foo'].disabled is False
+    assert loggers['foo.bar'].level == containerlog.INFO
+    assert loggers['foo.bar'].disabled is False
+    assert loggers['other'].level == containerlog.DEBUG
+    assert loggers['other'].disabled is False
