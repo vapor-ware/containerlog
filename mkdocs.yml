@@ -1,0 +1,82 @@
+# Project information
+site_name: containerlog
+site_description: Optimized, opinionated structured logging intended for containerized applications.
+site_author: Erick Daniszewski
+copyright: 'Copyright &copy; 2020'
+
+# Repository
+repo_name: containerlog
+repo_url: https://github.com/vapor-ware/containerlog
+edit_uri: tree/master/docs
+
+# Navigation
+nav:
+  - Overview: index.md
+  - Install: install.md
+  - Usage:
+      - Basic: usage/basic.md
+      - 'Proxying to Standard Loggers': usage/proxy_std.md
+  - Benchmarks: benchmarks.md
+  - Contributing: contributing.md
+
+# Configuration
+theme:
+  name: material
+  features:
+    - tabs
+    - instant
+  palette:
+    primary: black
+    accent: amber
+  font:
+    text: Roboto
+    code: Roboto Mono
+  favicon: logs.ico
+  logo: logs.svg
+
+  # Don't include MkDocs' JavaScript
+  include_search_page: false
+  search_index_only: true
+
+extra:
+  social:
+    - icon: fontawesome/solid/dice-d20
+      link: https://www.flaticon.com/authors/freepik
+      name: Icon made by Freepik from Flaticon
+
+# Plugins
+plugins:
+  - search
+
+# Extensions
+markdown_extensions:
+  - markdown.extensions.admonition
+  - markdown.extensions.codehilite:
+      guess_lang: false
+  - markdown.extensions.attr_list
+  - markdown.extensions.def_list
+  - markdown.extensions.footnotes
+  - markdown.extensions.meta
+  - markdown.extensions.tables
+  - markdown.extensions.toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.arithmatex
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      repo_url_shorthand: true
+      user: vapor-ware
+      repo: containerlog
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
