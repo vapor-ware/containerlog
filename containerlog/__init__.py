@@ -57,14 +57,14 @@ class Logger:
         '_previous_level',
     )
 
-    _level_lookup = {
-        0: 'trace',
-        1: 'debug',
-        2: 'info',
-        3: 'warn',
-        4: 'error',
-        5: 'critical',
-    }
+    _level_lookup = (
+        'trace',
+        'debug',
+        'info',
+        'warn',
+        'error',
+        'critical',
+    )
 
     def __init__(self, name: str, level: Optional[int] = None) -> None:
         self.name: str = name
