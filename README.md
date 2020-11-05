@@ -1,5 +1,7 @@
 # containerlog
 
+https://containerlog.readthedocs.io/en/docs/
+
 A lightweight, optimized, and opinionated structured logging library for Python, intended for containerized applications.
 
 `containerlog` was born out of a desire to have high-quality structured logging for
