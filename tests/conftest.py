@@ -16,7 +16,7 @@ def reset_manager():
 
 
 @pytest.fixture()
-def logger():
+def test_logger():
     """Fixture to get an instance of a Logger with mocked proxy module functions."""
     err = io.StringIO()
     out = io.StringIO()
@@ -25,10 +25,8 @@ def logger():
     log.utcnow = lambda: datetime.datetime(2020, 1, 1)
     log.writeout = out.write
     log.writeerr = err.write
-    log.err = err
-    log.out = out
 
-    yield log
+    yield log, out, err
 
     err.close()
     out.close()

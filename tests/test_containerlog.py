@@ -235,109 +235,122 @@ class TestLogger:
             ),
         ],
     )
-    def test_log(self, loglevel, msg, kwargs, out, err, logger):
+    def test_log(self, loglevel, msg, kwargs, out, err, test_logger):
+        logger, o, e = test_logger
+
         logger.level = loglevel
         logger._log(loglevel, msg, **kwargs)
 
-        # .out and .err monkey-patched in at fixture
-        assert logger.out.getvalue() == out
-        assert logger.err.getvalue() == err
+        assert o.getvalue() == out
+        assert e.getvalue() == err
 
-    def test_trace(self, logger):
+    def test_trace(self, test_logger):
+        logger, o, e = test_logger
+
         logger.level = containerlog.TRACE
         logger.trace('test message', key='value')
 
-        # .out and .err monkey-patched in at fixture
-        assert logger.out.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='trace' event='test message' key='value'\n"  # noqa
-        assert logger.err.getvalue() == ''
+        assert o.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='trace' event='test message' key='value'\n"  # noqa
+        assert e.getvalue() == ''
 
-    def test_trace_nolog(self, logger):
+    def test_trace_nolog(self, test_logger):
+        logger, o, e = test_logger
+
         logger.level = 99
         logger.trace('test message', key='value')
 
-        # .out and .err monkey-patched in at fixture
-        assert logger.out.getvalue() == ''
-        assert logger.err.getvalue() == ''
+        assert o.getvalue() == ''
+        assert e.getvalue() == ''
 
-    def test_debug(self, logger):
+    def test_debug(self, test_logger):
+        logger, o, e = test_logger
+
         logger.level = containerlog.DEBUG
         logger.debug('test message', key='value')
 
-        # .out and .err monkey-patched in at fixture
-        assert logger.out.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='debug' event='test message' key='value'\n"  # noqa
-        assert logger.err.getvalue() == ''
+        assert o.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='debug' event='test message' key='value'\n"  # noqa
+        assert e.getvalue() == ''
 
-    def test_debug_nolog(self, logger):
+    def test_debug_nolog(self, test_logger):
+        logger, o, e = test_logger
+
         logger.level = 99
         logger.debug('test message', key='value')
 
-        # .out and .err monkey-patched in at fixture
-        assert logger.out.getvalue() == ''
-        assert logger.err.getvalue() == ''
+        assert o.getvalue() == ''
+        assert e.getvalue() == ''
 
-    def test_info(self, logger):
+    def test_info(self, test_logger):
+        logger, o, e = test_logger
+
         logger.level = containerlog.INFO
         logger.info('test message', key='value')
 
-        # .out and .err monkey-patched in at fixture
-        assert logger.out.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='test message' key='value'\n"  # noqa
-        assert logger.err.getvalue() == ''
+        assert o.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='test message' key='value'\n"  # noqa
+        assert e.getvalue() == ''
 
-    def test_info_nolog(self, logger):
+    def test_info_nolog(self, test_logger):
+        logger, o, e = test_logger
+
         logger.level = 99
         logger.info('test message', key='value')
 
-        # .out and .err monkey-patched in at fixture
-        assert logger.out.getvalue() == ''
-        assert logger.err.getvalue() == ''
+        assert o.getvalue() == ''
+        assert e.getvalue() == ''
 
-    def test_warn(self, logger):
+    def test_warn(self, test_logger):
+        logger, o, e = test_logger
+
         logger.level = containerlog.WARN
         logger.warn('test message', key='value')
 
-        # .out and .err monkey-patched in at fixture
-        assert logger.out.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='warn' event='test message' key='value'\n"  # noqa
-        assert logger.err.getvalue() == ''
+        assert o.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='warn' event='test message' key='value'\n"  # noqa
+        assert e.getvalue() == ''
 
-    def test_warn_nolog(self, logger):
+    def test_warn_nolog(self, test_logger):
+        logger, o, e = test_logger
+
         logger.level = 99
         logger.warn('test message', key='value')
 
-        # .out and .err monkey-patched in at fixture
-        assert logger.out.getvalue() == ''
-        assert logger.err.getvalue() == ''
+        assert o.getvalue() == ''
+        assert e.getvalue() == ''
 
-    def test_error(self, logger):
+    def test_error(self, test_logger):
+        logger, o, e = test_logger
+
         logger.level = containerlog.ERROR
         logger.error('test message', key='value')
 
-        # .out and .err monkey-patched in at fixture
-        assert logger.out.getvalue() == ''
-        assert logger.err.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='error' event='test message' key='value'\n"  # noqa
+        assert o.getvalue() == ''
+        assert e.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='error' event='test message' key='value'\n"  # noqa
 
-    def test_error_nolog(self, logger):
+    def test_error_nolog(self, test_logger):
+        logger, o, e = test_logger
+
         logger.level = 99
         logger.error('test message', key='value')
 
-        # .out and .err monkey-patched in at fixture
-        assert logger.out.getvalue() == ''
-        assert logger.err.getvalue() == ''
+        assert o.getvalue() == ''
+        assert e.getvalue() == ''
 
-    def test_critical(self, logger):
+    def test_critical(self, test_logger):
+        logger, o, e = test_logger
+
         logger.level = containerlog.CRITICAL
         logger.critical('test message', key='value')
 
-        # .out and .err monkey-patched in at fixture
-        assert logger.out.getvalue() == ''
-        assert logger.err.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='critical' event='test message' key='value'\n"  # noqa
+        assert o.getvalue() == ''
+        assert e.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='critical' event='test message' key='value'\n"  # noqa
 
-    def test_critical_nolog(self, logger):
+    def test_critical_nolog(self, test_logger):
+        logger, o, e = test_logger
+
         logger.level = 99
         logger.critical('test message', key='value')
 
-        # .out and .err monkey-patched in at fixture
-        assert logger.out.getvalue() == ''
-        assert logger.err.getvalue() == ''
+        assert o.getvalue() == ''
+        assert e.getvalue() == ''
 
 
 def test_get_logger_existing():
