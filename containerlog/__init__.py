@@ -48,6 +48,15 @@ class Logger:
             level may be set for all loggers globally via `set_level`.
     """
 
+    __slots__ = (
+        'name',
+        'level',
+        'utcnow',
+        'writeout',
+        'writeerr',
+        '_previous_level',
+    )
+
     _level_lookup = {
         0: 'trace',
         1: 'debug',
@@ -228,6 +237,11 @@ class Manager:
     Args:
         level: The global log level to apply to all Loggers on initialization.
     """
+
+    __slots__ = (
+        'level',
+        'loggers',
+    )
 
     def __init__(self, level: int = DEBUG) -> None:
         self.level: int = level
