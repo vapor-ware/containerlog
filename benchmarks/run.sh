@@ -26,9 +26,17 @@ if [ $retVal -ne 0 ]; then
     exit 1
 fi
 
-rm std_results.txt
-rm containerlog_results.txt
-rm std_proxy_results.txt
+if [ ! -d "raw" ]; then
+  mkdir "raw"
+fi
+
+if [ ! -d "raw/${containerlog_version}" ]; then
+  mkdir "raw/${containerlog_version}"
+fi
+
+mv std_results.txt "raw/${containerlog_version}/std_results.txt"
+mv containerlog_results.txt "raw/${containerlog_version}/containerlog_results.txt"
+mv std_proxy_results.txt "raw/${containerlog_version}/std_proxy_results.txt"
 
 echo ""
 echo "Done. The following artifacts have been generated:"
