@@ -39,7 +39,7 @@ It is only intended to work for Python 3.6+.
 
 ## Usage
 
-See the documentation at https://containerlog.readthedocs.io/en/docs/
+See the documentation at https://containerlog.readthedocs.io/en/latest/
 
 ## Optimizations
 
