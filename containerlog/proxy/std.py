@@ -126,13 +126,16 @@ def _map_level(level: Union[int, str]) -> int:
         The corresponding containerlog log level.
     """
     level = _normalize_level(level)
+    if level < logging.DEBUG:
+        return containerlog.TRACE
+    elif level > logging.CRITICAL:
+        return containerlog.CRITICAL
     return {
         logging.DEBUG: containerlog.DEBUG,
         logging.INFO: containerlog.INFO,
         logging.WARNING: containerlog.WARN,
         logging.ERROR: containerlog.ERROR,
         logging.CRITICAL: containerlog.CRITICAL,
-        logging.NOTSET: 99,  # effective disabled
     }.get(level, 90)
 
 
@@ -194,6 +197,21 @@ class StdLoggerProxy(Logger):
     def writeerr(self, fn):
         self.containerlog.writeerr = fn
 
+    def trace(self, msg, *args, **kwargs):
+        """Log a message at TRACE level.
+
+        The trace level is not natively supported by the Python standard logger,
+        but the standard logger does allow for custom log levels to be set. If
+        a log level is set which is below debug, it will get routed to this trace
+        logger.
+        """
+        extras = {}
+        if 'extra' in kwargs:
+            extras = kwargs['extra']
+        if args:
+            msg = msg % args
+        self.containerlog.trace(msg, **extras)
+
     def debug(self, msg, *args, **kwargs):
         """Log a message at DEBUG level."""
         extras = {}
@@ -254,7 +272,22 @@ class StdLoggerProxy(Logger):
 
     def log(self, level, msg, *args, **kwargs):
         """Log a message at the specified level."""
-        name = logging._levelToName.get(level)
+        name = _get_level_name(level)
         if not name:
             return
-        getattr(self, name.lower())(msg, *args, **kwargs)
+        getattr(self, name)(msg, *args, **kwargs)
+
+
+def _get_level_name(level):
+    """Get the name of the log method to use for the StdLoggerProxy based
+    on the logging log level provided.
+    """
+    if level < logging.DEBUG:
+        return 'trace'
+    if level > logging.CRITICAL:
+        return 'critical'
+
+    name = logging._levelToName.get(level)
+    if not name:
+        return
+    return name.lower()
