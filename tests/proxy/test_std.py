@@ -252,13 +252,21 @@ class TestStdLoggerProxy:
         assert std_proxy_logger.out.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='message' \n"  # noqa
         assert std_proxy_logger.err.getvalue() == ''
 
-    def test_log_no_log_name(self, std_proxy_logger):
+    def test_log_below_debug(self, std_proxy_logger):
+        std_proxy_logger.setLevel(logging.NOTSET)
+        std_proxy_logger.log(5, 'message')
+
+        # .out and .err monkey-patched in at fixture
+        assert std_proxy_logger.out.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='trace' event='message' \n"  # noqa
+        assert std_proxy_logger.err.getvalue() == ''
+
+    def test_log_above_critical(self, std_proxy_logger):
         std_proxy_logger.setLevel(logging.DEBUG)
         std_proxy_logger.log(30000, 'message')
 
         # .out and .err monkey-patched in at fixture
         assert std_proxy_logger.out.getvalue() == ''
-        assert std_proxy_logger.err.getvalue() == ''
+        assert std_proxy_logger.err.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='critical' event='message' \n"  # noqa
 
 
 @mock.patch('containerlog.proxy.std._patch_all')
@@ -352,6 +360,9 @@ def test_patch_logger():
 
 @pytest.mark.parametrize(
     'level,expected', [
+        (-1, containerlog.TRACE),
+        (logging.NOTSET, containerlog.TRACE),
+        (5, containerlog.TRACE),
         (logging.DEBUG, containerlog.DEBUG),
         (logging.INFO, containerlog.INFO),
         (logging.WARN, containerlog.WARN),
@@ -359,10 +370,27 @@ def test_patch_logger():
         (logging.ERROR, containerlog.ERROR),
         (logging.CRITICAL, containerlog.CRITICAL),
         (logging.FATAL, containerlog.CRITICAL),
-        (logging.NOTSET, 99),
-        (1234, 90),
-        (-1, 90),
+        (1234, containerlog.CRITICAL),
+        (25, 90),
     ]
 )
 def test_map_level(level, expected):
     assert expected == std._map_level(level)
+
+
+@pytest.mark.parametrize(
+    'level,expected', [
+        (0, 'trace'),
+        (5, 'trace'),
+        (logging.DEBUG, 'debug'),
+        (logging.INFO, 'info'),
+        (logging.WARN, 'warning'),
+        (logging.WARNING, 'warning'),
+        (logging.ERROR, 'error'),
+        (logging.FATAL, 'critical'),
+        (logging.CRITICAL, 'critical'),
+        (60, 'critical'),
+    ],
+)
+def test_get_level_name(level, expected):
+    assert std._get_level_name(level) == expected
