@@ -6,7 +6,6 @@ import containerlog
 
 
 class TestManager:
-
     def test_init(self):
         manager = containerlog.Manager()
         assert manager.level == containerlog.DEBUG
@@ -19,7 +18,7 @@ class TestManager:
 
     def test_set_levels_no_loggers(self):
         manager = containerlog.Manager(level=containerlog.ERROR)
-        logger = containerlog.Logger(name='test')
+        logger = containerlog.Logger(name="test")
         manager.set_levels()
 
         # Verify that the manager level is ERROR
@@ -30,9 +29,9 @@ class TestManager:
         assert logger.level == containerlog.DEBUG
 
     def test_set_levels_with_loggers(self):
-        logger = containerlog.Logger(name='test')
+        logger = containerlog.Logger(name="test")
         manager = containerlog.Manager(level=containerlog.ERROR)
-        manager.loggers = {'test': logger}
+        manager.loggers = {"test": logger}
 
         assert logger.level == containerlog.DEBUG
         assert manager.level == containerlog.ERROR
@@ -44,21 +43,20 @@ class TestManager:
 
 
 class TestLogger:
-
     def test_init(self):
-        logger = containerlog.Logger(name='test', level=containerlog.INFO)
-        assert logger.name == 'test'
+        logger = containerlog.Logger(name="test", level=containerlog.INFO)
+        assert logger.name == "test"
         assert logger.level == containerlog.INFO
         assert logger._previous_level is None
 
     def test_init_default_level(self):
-        logger = containerlog.Logger(name='test')
-        assert logger.name == 'test'
+        logger = containerlog.Logger(name="test")
+        assert logger.name == "test"
         assert logger.level == containerlog.DEBUG
         assert logger._previous_level is None
 
     def test_disable(self):
-        logger = containerlog.Logger(name='test')
+        logger = containerlog.Logger(name="test")
         assert logger.level == containerlog.DEBUG
         assert logger._previous_level is None
 
@@ -67,7 +65,7 @@ class TestLogger:
         assert logger._previous_level == containerlog.DEBUG
 
     def test_disable_already_disabled(self):
-        logger = containerlog.Logger(name='test')
+        logger = containerlog.Logger(name="test")
         assert logger.level == containerlog.DEBUG
         assert logger._previous_level is None
 
@@ -80,7 +78,7 @@ class TestLogger:
         assert logger._previous_level == containerlog.DEBUG
 
     @pytest.mark.parametrize(
-        'loglevel',
+        "loglevel",
         [
             containerlog.TRACE,
             containerlog.DEBUG,
@@ -91,7 +89,7 @@ class TestLogger:
         ],
     )
     def test_enable_from_disabled(self, loglevel):
-        logger = containerlog.Logger(name='test', level=loglevel)
+        logger = containerlog.Logger(name="test", level=loglevel)
         assert logger.level == loglevel
         assert logger._previous_level is None
 
@@ -104,7 +102,7 @@ class TestLogger:
         assert logger._previous_level == loglevel
 
     @pytest.mark.parametrize(
-        'loglevel',
+        "loglevel",
         [
             containerlog.TRACE,
             containerlog.DEBUG,
@@ -115,7 +113,7 @@ class TestLogger:
         ],
     )
     def test_enable_already_enabled(self, loglevel):
-        logger = containerlog.Logger(name='test', level=loglevel)
+        logger = containerlog.Logger(name="test", level=loglevel)
         assert logger.level == loglevel
         assert logger._previous_level is None
 
@@ -124,113 +122,113 @@ class TestLogger:
         assert logger._previous_level is None
 
     def test_disabled_false(self):
-        logger = containerlog.Logger(name='test')
+        logger = containerlog.Logger(name="test")
         assert logger.disabled is False
 
     def test_disabled_true(self):
-        logger = containerlog.Logger(name='test')
+        logger = containerlog.Logger(name="test")
         logger.disable()
         assert logger.disabled is True
 
     @pytest.mark.parametrize(
-        'loglevel,msg,kwargs,out,err',
+        "loglevel,msg,kwargs,out,err",
         [
             (
                 0,  # trace
-                'test msg',
+                "test msg",
                 {},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='trace' event='test msg' \n",  # noqa
-                '',
+                "",
             ),
             (
                 1,  # debug
                 "msg 'foo'",
                 {},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='debug' event='msg \\'foo\\'' \n",  # noqa
-                '',
+                "",
             ),
             (
                 2,  # info
-                'msg',
-                {'a': 1},
+                "msg",
+                {"a": 1},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='msg' a=1\n",  # noqa
-                '',
+                "",
             ),
             (
                 2,  # info
-                'msg',
-                {'a': 'foo'},
+                "msg",
+                {"a": "foo"},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='msg' a='foo'\n",  # noqa
-                '',
+                "",
             ),
             (
                 2,  # info
-                'msg',
-                {'a': [1, 2]},
+                "msg",
+                {"a": [1, 2]},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='msg' a=[1, 2]\n",  # noqa
-                '',
+                "",
             ),
             (
                 2,  # info
-                'msg',
-                {'a': (2, 3)},
+                "msg",
+                {"a": (2, 3)},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='msg' a=(2, 3)\n",  # noqa
-                '',
+                "",
             ),
             (
                 2,  # info
-                'msg',
-                {'a': {2, 3}},
+                "msg",
+                {"a": {2, 3}},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='msg' a={2, 3}\n",  # noqa
-                '',
+                "",
             ),
             (
                 2,  # info
-                'msg',
-                {'a': {'x': 1}},
+                "msg",
+                {"a": {"x": 1}},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='msg' a={'x': 1}\n",  # noqa
-                '',
+                "",
             ),
             (
                 2,  # info
-                'msg',
-                {'timestamp': 1},
+                "msg",
+                {"timestamp": 1},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='msg' _timestamp=1\n",  # noqa
-                '',
+                "",
             ),
             (
                 2,  # info
-                'msg',
-                {'logger': 1},
+                "msg",
+                {"logger": 1},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='msg' _logger=1\n",  # noqa
-                '',
+                "",
             ),
             (
                 2,  # info
-                'msg',
-                {'level': 1},
+                "msg",
+                {"level": 1},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='msg' _level=1\n",  # noqa
-                '',
+                "",
             ),
             (
                 2,  # info
-                'msg',
-                {'event': 1},
+                "msg",
+                {"event": 1},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='msg' _event=1\n",  # noqa
-                '',
+                "",
             ),
             (
                 4,  # error
-                'msg',
-                {'a': 1, 'b': 2},
-                '',
+                "msg",
+                {"a": 1, "b": 2},
+                "",
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='error' event='msg' a=1 b=2\n",  # noqa
             ),
             (
                 5,  # critical
-                'msg',
-                {'a': 1, 'b': 2},
-                '',
+                "msg",
+                {"a": 1, "b": 2},
+                "",
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='critical' event='msg' a=1 b=2\n",  # noqa
             ),
         ],
@@ -248,117 +246,135 @@ class TestLogger:
         logger, o, e = test_logger
 
         logger.level = containerlog.TRACE
-        logger.trace('test message', key='value')
+        logger.trace("test message", key="value")
 
-        assert o.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='trace' event='test message' key='value'\n"  # noqa
-        assert e.getvalue() == ''
+        assert (
+            o.getvalue()
+            == "timestamp='2020-01-01T00:00:00Z' logger='test' level='trace' event='test message' key='value'\n"
+        )  # noqa
+        assert e.getvalue() == ""
 
     def test_trace_nolog(self, test_logger):
         logger, o, e = test_logger
 
         logger.level = 99
-        logger.trace('test message', key='value')
+        logger.trace("test message", key="value")
 
-        assert o.getvalue() == ''
-        assert e.getvalue() == ''
+        assert o.getvalue() == ""
+        assert e.getvalue() == ""
 
     def test_debug(self, test_logger):
         logger, o, e = test_logger
 
         logger.level = containerlog.DEBUG
-        logger.debug('test message', key='value')
+        logger.debug("test message", key="value")
 
-        assert o.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='debug' event='test message' key='value'\n"  # noqa
-        assert e.getvalue() == ''
+        assert (
+            o.getvalue()
+            == "timestamp='2020-01-01T00:00:00Z' logger='test' level='debug' event='test message' key='value'\n"
+        )  # noqa
+        assert e.getvalue() == ""
 
     def test_debug_nolog(self, test_logger):
         logger, o, e = test_logger
 
         logger.level = 99
-        logger.debug('test message', key='value')
+        logger.debug("test message", key="value")
 
-        assert o.getvalue() == ''
-        assert e.getvalue() == ''
+        assert o.getvalue() == ""
+        assert e.getvalue() == ""
 
     def test_info(self, test_logger):
         logger, o, e = test_logger
 
         logger.level = containerlog.INFO
-        logger.info('test message', key='value')
+        logger.info("test message", key="value")
 
-        assert o.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='test message' key='value'\n"  # noqa
-        assert e.getvalue() == ''
+        assert (
+            o.getvalue()
+            == "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='test message' key='value'\n"
+        )  # noqa
+        assert e.getvalue() == ""
 
     def test_info_nolog(self, test_logger):
         logger, o, e = test_logger
 
         logger.level = 99
-        logger.info('test message', key='value')
+        logger.info("test message", key="value")
 
-        assert o.getvalue() == ''
-        assert e.getvalue() == ''
+        assert o.getvalue() == ""
+        assert e.getvalue() == ""
 
     def test_warn(self, test_logger):
         logger, o, e = test_logger
 
         logger.level = containerlog.WARN
-        logger.warn('test message', key='value')
+        logger.warn("test message", key="value")
 
-        assert o.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='warn' event='test message' key='value'\n"  # noqa
-        assert e.getvalue() == ''
+        assert (
+            o.getvalue()
+            == "timestamp='2020-01-01T00:00:00Z' logger='test' level='warn' event='test message' key='value'\n"
+        )  # noqa
+        assert e.getvalue() == ""
 
     def test_warn_nolog(self, test_logger):
         logger, o, e = test_logger
 
         logger.level = 99
-        logger.warn('test message', key='value')
+        logger.warn("test message", key="value")
 
-        assert o.getvalue() == ''
-        assert e.getvalue() == ''
+        assert o.getvalue() == ""
+        assert e.getvalue() == ""
 
     def test_error(self, test_logger):
         logger, o, e = test_logger
 
         logger.level = containerlog.ERROR
-        logger.error('test message', key='value')
+        logger.error("test message", key="value")
 
-        assert o.getvalue() == ''
-        assert e.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='error' event='test message' key='value'\n"  # noqa
+        assert o.getvalue() == ""
+        assert (
+            e.getvalue()
+            == "timestamp='2020-01-01T00:00:00Z' logger='test' level='error' event='test message' key='value'\n"
+        )  # noqa
 
     def test_error_nolog(self, test_logger):
         logger, o, e = test_logger
 
         logger.level = 99
-        logger.error('test message', key='value')
+        logger.error("test message", key="value")
 
-        assert o.getvalue() == ''
-        assert e.getvalue() == ''
+        assert o.getvalue() == ""
+        assert e.getvalue() == ""
 
     def test_critical(self, test_logger):
         logger, o, e = test_logger
 
         logger.level = containerlog.CRITICAL
-        logger.critical('test message', key='value')
+        logger.critical("test message", key="value")
 
-        assert o.getvalue() == ''
-        assert e.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='critical' event='test message' key='value'\n"  # noqa
+        assert o.getvalue() == ""
+        assert (
+            e.getvalue()
+            == "timestamp='2020-01-01T00:00:00Z' logger='test' level='critical' event='test message' key='value'\n"
+        )  # noqa
 
     def test_critical_nolog(self, test_logger):
         logger, o, e = test_logger
 
         logger.level = 99
-        logger.critical('test message', key='value')
+        logger.critical("test message", key="value")
 
-        assert o.getvalue() == ''
-        assert e.getvalue() == ''
+        assert o.getvalue() == ""
+        assert e.getvalue() == ""
 
 
 def test_get_logger_existing():
-    expected = containerlog.Logger('test')
-    containerlog.manager.loggers['test'] = expected
+    expected = containerlog.Logger("test")
+    containerlog.manager.loggers["test"] = expected
     assert len(containerlog.manager.loggers) == 1
 
-    logger = containerlog.get_logger('test')
+    logger = containerlog.get_logger("test")
     assert logger == expected
     assert len(containerlog.manager.loggers) == 1
 
@@ -366,8 +382,8 @@ def test_get_logger_existing():
 def test_get_logger_new_with_name():
     assert len(containerlog.manager.loggers) == 0
 
-    logger = containerlog.get_logger('test')
-    assert logger.name == 'test'
+    logger = containerlog.get_logger("test")
+    assert logger.name == "test"
     assert logger.level == containerlog.DEBUG
     assert len(containerlog.manager.loggers) == 1
 
@@ -376,20 +392,20 @@ def test_get_logger_new_no_name():
     assert len(containerlog.manager.loggers) == 0
 
     logger = containerlog.get_logger()
-    assert logger.name == 'test_containerlog.test_get_logger_new_no_name'
+    assert logger.name == "test_containerlog.test_get_logger_new_no_name"
     assert logger.level == containerlog.DEBUG
     assert len(containerlog.manager.loggers) == 1
 
 
 def test_caller_name():
     name = containerlog._caller_name(skip=1)
-    assert name == 'test_containerlog.test_caller_name'
+    assert name == "test_containerlog.test_caller_name"
 
 
 def test_set_level():
     containerlog.manager.loggers = {
-        'test': containerlog.Logger('test'),
-        'foo': containerlog.Logger('foo'),
+        "test": containerlog.Logger("test"),
+        "foo": containerlog.Logger("foo"),
     }
     assert containerlog.manager.level == containerlog.DEBUG
     for logger in containerlog.manager.loggers.values():
@@ -403,83 +419,83 @@ def test_set_level():
 
 def test_disable_glob():
     loggers = {
-        'test': containerlog.Logger('test'),
-        'foo': containerlog.Logger('foo'),
-        'foo.bar': containerlog.Logger('foo.bar'),
-        'other': containerlog.Logger('other', level=99)
+        "test": containerlog.Logger("test"),
+        "foo": containerlog.Logger("foo"),
+        "foo.bar": containerlog.Logger("foo.bar"),
+        "other": containerlog.Logger("other", level=99),
     }
 
     containerlog.manager.loggers = loggers
-    containerlog.disable('foo*', 'other')
+    containerlog.disable("foo*", "other")
 
-    assert loggers['test'].level == containerlog.DEBUG
-    assert loggers['test'].disabled is False
-    assert loggers['foo'].level == 99
-    assert loggers['foo'].disabled is True
-    assert loggers['foo.bar'].level == 99
-    assert loggers['foo.bar'].disabled is True
-    assert loggers['other'].level == 99
-    assert loggers['other'].disabled is True
+    assert loggers["test"].level == containerlog.DEBUG
+    assert loggers["test"].disabled is False
+    assert loggers["foo"].level == 99
+    assert loggers["foo"].disabled is True
+    assert loggers["foo.bar"].level == 99
+    assert loggers["foo.bar"].disabled is True
+    assert loggers["other"].level == 99
+    assert loggers["other"].disabled is True
 
 
 def test_disable_all():
     loggers = {
-        'test': containerlog.Logger('test'),
-        'foo': containerlog.Logger('foo'),
-        'foo.bar': containerlog.Logger('foo.bar'),
-        'other': containerlog.Logger('other', level=99)
+        "test": containerlog.Logger("test"),
+        "foo": containerlog.Logger("foo"),
+        "foo.bar": containerlog.Logger("foo.bar"),
+        "other": containerlog.Logger("other", level=99),
     }
 
     containerlog.manager.loggers = loggers
     containerlog.disable()
 
-    assert loggers['test'].level == 99
-    assert loggers['test'].disabled is True
-    assert loggers['foo'].level == 99
-    assert loggers['foo'].disabled is True
-    assert loggers['foo.bar'].level == 99
-    assert loggers['foo.bar'].disabled is True
-    assert loggers['other'].level == 99
-    assert loggers['other'].disabled is True
+    assert loggers["test"].level == 99
+    assert loggers["test"].disabled is True
+    assert loggers["foo"].level == 99
+    assert loggers["foo"].disabled is True
+    assert loggers["foo.bar"].level == 99
+    assert loggers["foo.bar"].disabled is True
+    assert loggers["other"].level == 99
+    assert loggers["other"].disabled is True
 
 
 def test_enable_glob():
     loggers = {
-        'test': containerlog.Logger('test', level=99),
-        'foo': containerlog.Logger('foo', level=99),
-        'foo.bar': containerlog.Logger('foo.bar', level=containerlog.INFO),
-        'other': containerlog.Logger('other', level=99)
+        "test": containerlog.Logger("test", level=99),
+        "foo": containerlog.Logger("foo", level=99),
+        "foo.bar": containerlog.Logger("foo.bar", level=containerlog.INFO),
+        "other": containerlog.Logger("other", level=99),
     }
 
     containerlog.manager.loggers = loggers
-    containerlog.enable('foo*', 'other')
+    containerlog.enable("foo*", "other")
 
-    assert loggers['test'].level == 99
-    assert loggers['test'].disabled is True
-    assert loggers['foo'].level == containerlog.DEBUG
-    assert loggers['foo'].disabled is False
-    assert loggers['foo.bar'].level == containerlog.INFO
-    assert loggers['foo.bar'].disabled is False
-    assert loggers['other'].level == containerlog.DEBUG
-    assert loggers['other'].disabled is False
+    assert loggers["test"].level == 99
+    assert loggers["test"].disabled is True
+    assert loggers["foo"].level == containerlog.DEBUG
+    assert loggers["foo"].disabled is False
+    assert loggers["foo.bar"].level == containerlog.INFO
+    assert loggers["foo.bar"].disabled is False
+    assert loggers["other"].level == containerlog.DEBUG
+    assert loggers["other"].disabled is False
 
 
 def test_enable_all():
     loggers = {
-        'test': containerlog.Logger('test', level=99),
-        'foo': containerlog.Logger('foo', level=99),
-        'foo.bar': containerlog.Logger('foo.bar', level=containerlog.INFO),
-        'other': containerlog.Logger('other', level=99)
+        "test": containerlog.Logger("test", level=99),
+        "foo": containerlog.Logger("foo", level=99),
+        "foo.bar": containerlog.Logger("foo.bar", level=containerlog.INFO),
+        "other": containerlog.Logger("other", level=99),
     }
 
     containerlog.manager.loggers = loggers
     containerlog.enable()
 
-    assert loggers['test'].level == containerlog.DEBUG
-    assert loggers['test'].disabled is False
-    assert loggers['foo'].level == containerlog.DEBUG
-    assert loggers['foo'].disabled is False
-    assert loggers['foo.bar'].level == containerlog.INFO
-    assert loggers['foo.bar'].disabled is False
-    assert loggers['other'].level == containerlog.DEBUG
-    assert loggers['other'].disabled is False
+    assert loggers["test"].level == containerlog.DEBUG
+    assert loggers["test"].disabled is False
+    assert loggers["foo"].level == containerlog.DEBUG
+    assert loggers["foo"].disabled is False
+    assert loggers["foo.bar"].level == containerlog.INFO
+    assert loggers["foo.bar"].disabled is False
+    assert loggers["other"].level == containerlog.DEBUG
+    assert loggers["other"].disabled is False

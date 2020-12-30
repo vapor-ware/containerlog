@@ -120,15 +120,15 @@ logger.info('connected to remote server', ip=server_ip, port=server_port)
 
 !!! Tip
     Since this library is intended to be used for structured logging, avoid logging formatted messages to minimize the performance penalty from the additional string format.
-    
+
     If a logger is configured at `INFO` level, a debug message
-    
+
     ```python
     logger.debug(f'got a value: {value}')
-    ``` 
-    
+    ```
+
     would **not** get logged, but the string formatting woulds still happen since it is done upfront, not within the log function. Instead, pass values as keyword arguments.
-    
+
     ```python
     logger.debug('got a value', value=value)
     ```
@@ -145,7 +145,7 @@ To disable a logger, simply call the `disable()` method.
 
 ```python
 logger.disable()
-```  
+```
 
 this will prevent it from emitting any logs.
 
@@ -162,7 +162,7 @@ If a logger was previously disabled, it can be re-enabled by calling the Logger'
 
 ```python
 logger.enable()
-``` 
+```
 
 This will restore its log level to its previously known level, prior to having `disable()` called.
 

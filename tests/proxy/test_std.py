@@ -11,15 +11,14 @@ from containerlog.proxy import std
 
 
 class TestStdLoggerProxy:
-
     def test_init(self):
-        logger = std.StdLoggerProxy('foo')
+        logger = std.StdLoggerProxy("foo")
         assert isinstance(logger, logging.Logger)
         assert logger.containerlog is not None
-        assert logger.containerlog.name == 'foo'
+        assert logger.containerlog.name == "foo"
 
     def test_set_level(self):
-        logger = std.StdLoggerProxy('foo')
+        logger = std.StdLoggerProxy("foo")
         assert logger.containerlog.level == containerlog.DEBUG
 
         logger.setLevel(logging.WARN)
@@ -27,7 +26,7 @@ class TestStdLoggerProxy:
         assert logger.containerlog.level == containerlog.WARN
 
     def test_get_set_writeout(self):
-        logger = std.StdLoggerProxy('foo')
+        logger = std.StdLoggerProxy("foo")
 
         def placeholder():
             pass
@@ -40,7 +39,7 @@ class TestStdLoggerProxy:
         assert logger.containerlog.writeout == placeholder
 
     def test_get_set_writeerr(self):
-        logger = std.StdLoggerProxy('foo')
+        logger = std.StdLoggerProxy("foo")
 
         def placeholder():
             pass
@@ -53,28 +52,39 @@ class TestStdLoggerProxy:
         assert logger.containerlog.writeerr == placeholder
 
     @pytest.mark.parametrize(
-        'msg,args,kwargs,out', [
+        "msg,args,kwargs,out",
+        [
             (
-                'message', [], {},
+                "message",
+                [],
+                {},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='debug' event='message' \n",
             ),
             (
-                'message %s', ['value'], {},
+                "message %s",
+                ["value"],
+                {},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='debug' event='message value' \n",
             ),
             (
-                'message', [], {'extra': {'something': 'else'}},
+                "message",
+                [],
+                {"extra": {"something": "else"}},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='debug' event='message' something='else'\n",
             ),
             (
-                'message %s', ['value'], {'extra': {'something': 'else'}},
+                "message %s",
+                ["value"],
+                {"extra": {"something": "else"}},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='debug' event='message value' something='else'\n",
             ),
             (
-                'message', [], {'unknown': True, 'values': 'foobar'},
+                "message",
+                [],
+                {"unknown": True, "values": "foobar"},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='debug' event='message' \n",
             ),
-        ]
+        ],
     )
     def test_debug(self, msg, args, kwargs, out, std_proxy_logger):
         std_proxy_logger.setLevel(logging.DEBUG)
@@ -82,31 +92,42 @@ class TestStdLoggerProxy:
 
         # .out and .err monkey-patched in at fixture
         assert std_proxy_logger.out.getvalue() == out
-        assert std_proxy_logger.err.getvalue() == ''
+        assert std_proxy_logger.err.getvalue() == ""
 
     @pytest.mark.parametrize(
-        'msg,args,kwargs,out', [
+        "msg,args,kwargs,out",
+        [
             (
-                'message', [], {},
+                "message",
+                [],
+                {},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='message' \n",
             ),
             (
-                'message %s', ['value'], {},
+                "message %s",
+                ["value"],
+                {},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='message value' \n",
             ),
             (
-                'message', [], {'extra': {'something': 'else'}},
+                "message",
+                [],
+                {"extra": {"something": "else"}},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='message' something='else'\n",
             ),
             (
-                'message %s', ['value'], {'extra': {'something': 'else'}},
+                "message %s",
+                ["value"],
+                {"extra": {"something": "else"}},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='message value' something='else'\n",
             ),
             (
-                'message', [], {'unknown': True, 'values': 'foobar'},
+                "message",
+                [],
+                {"unknown": True, "values": "foobar"},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='message' \n",
             ),
-        ]
+        ],
     )
     def test_info(self, msg, args, kwargs, out, std_proxy_logger):
         std_proxy_logger.setLevel(logging.INFO)
@@ -114,31 +135,42 @@ class TestStdLoggerProxy:
 
         # .out and .err monkey-patched in at fixture
         assert std_proxy_logger.out.getvalue() == out
-        assert std_proxy_logger.err.getvalue() == ''
+        assert std_proxy_logger.err.getvalue() == ""
 
     @pytest.mark.parametrize(
-        'msg,args,kwargs,out', [
+        "msg,args,kwargs,out",
+        [
             (
-                'message', [], {},
+                "message",
+                [],
+                {},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='warn' event='message' \n",
             ),
             (
-                'message %s', ['value'], {},
+                "message %s",
+                ["value"],
+                {},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='warn' event='message value' \n",
             ),
             (
-                'message', [], {'extra': {'something': 'else'}},
+                "message",
+                [],
+                {"extra": {"something": "else"}},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='warn' event='message' something='else'\n",
             ),
             (
-                'message %s', ['value'], {'extra': {'something': 'else'}},
+                "message %s",
+                ["value"],
+                {"extra": {"something": "else"}},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='warn' event='message value' something='else'\n",
             ),
             (
-                'message', [], {'unknown': True, 'values': 'foobar'},
+                "message",
+                [],
+                {"unknown": True, "values": "foobar"},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='warn' event='message' \n",
             ),
-        ]
+        ],
     )
     def test_warning(self, msg, args, kwargs, out, std_proxy_logger):
         std_proxy_logger.setLevel(logging.WARNING)
@@ -146,171 +178,225 @@ class TestStdLoggerProxy:
 
         # .out and .err monkey-patched in at fixture
         assert std_proxy_logger.out.getvalue() == out
-        assert std_proxy_logger.err.getvalue() == ''
+        assert std_proxy_logger.err.getvalue() == ""
 
     @pytest.mark.parametrize(
-        'msg,args,kwargs,out', [
+        "msg,args,kwargs,out",
+        [
             (
-                'message', [], {},
+                "message",
+                [],
+                {},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='error' event='message' \n",
             ),
             (
-                'message %s', ['value'], {},
+                "message %s",
+                ["value"],
+                {},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='error' event='message value' \n",
             ),
             (
-                'message', [], {'extra': {'something': 'else'}},
+                "message",
+                [],
+                {"extra": {"something": "else"}},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='error' event='message' something='else'\n",
             ),
             (
-                'message %s', ['value'], {'extra': {'something': 'else'}},
+                "message %s",
+                ["value"],
+                {"extra": {"something": "else"}},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='error' event='message value' something='else'\n",
             ),
             (
-                'message', [], {'unknown': True, 'values': 'foobar'},
+                "message",
+                [],
+                {"unknown": True, "values": "foobar"},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='error' event='message' \n",
             ),
-        ]
+        ],
     )
     def test_error(self, msg, args, kwargs, out, std_proxy_logger):
         std_proxy_logger.setLevel(logging.ERROR)
         std_proxy_logger.error(msg, *args, **kwargs)
 
         # .out and .err monkey-patched in at fixture
-        assert std_proxy_logger.out.getvalue() == ''
+        assert std_proxy_logger.out.getvalue() == ""
         assert std_proxy_logger.err.getvalue() == out
 
     @pytest.mark.parametrize(
-        'msg,args,kwargs,out', [
+        "msg,args,kwargs,out",
+        [
             (
-                'message', [], {},
+                "message",
+                [],
+                {},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='error' event='message' \nNoneType: None\n",  # noqa
             ),
             (
-                'message %s', ['value'], {},
+                "message %s",
+                ["value"],
+                {},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='error' event='message value' \nNoneType: None\n",  # noqa
             ),
             (
-                'message', [], {'extra': {'something': 'else'}},
+                "message",
+                [],
+                {"extra": {"something": "else"}},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='error' event='message' something='else'\nNoneType: None\n",  # noqa
             ),
             (
-                'message %s', ['value'], {'extra': {'something': 'else'}},
+                "message %s",
+                ["value"],
+                {"extra": {"something": "else"}},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='error' event='message value' something='else'\nNoneType: None\n",  # noqa
             ),
             (
-                'message', [], {'unknown': True, 'values': 'foobar'},
+                "message",
+                [],
+                {"unknown": True, "values": "foobar"},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='error' event='message' \nNoneType: None\n",  # noqa
             ),
-        ]
+        ],
     )
     def test_exception(self, msg, args, kwargs, out, std_proxy_logger):
         std_proxy_logger.setLevel(logging.ERROR)
         std_proxy_logger.exception(msg, *args, **kwargs)
 
         # .out and .err monkey-patched in at fixture
-        assert std_proxy_logger.out.getvalue() == ''
+        assert std_proxy_logger.out.getvalue() == ""
         assert std_proxy_logger.err.getvalue() == out
 
     @pytest.mark.parametrize(
-        'msg,args,kwargs,out', [
+        "msg,args,kwargs,out",
+        [
             (
-                'message', [], {},
+                "message",
+                [],
+                {},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='critical' event='message' \n",
             ),
             (
-                'message %s', ['value'], {},
+                "message %s",
+                ["value"],
+                {},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='critical' event='message value' \n",
             ),
             (
-                'message', [], {'extra': {'something': 'else'}},
+                "message",
+                [],
+                {"extra": {"something": "else"}},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='critical' event='message' something='else'\n",
             ),
             (
-                'message %s', ['value'], {'extra': {'something': 'else'}},
+                "message %s",
+                ["value"],
+                {"extra": {"something": "else"}},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='critical' event='message value' something='else'\n",  # noqa
             ),
             (
-                'message', [], {'unknown': True, 'values': 'foobar'},
+                "message",
+                [],
+                {"unknown": True, "values": "foobar"},
                 "timestamp='2020-01-01T00:00:00Z' logger='test' level='critical' event='message' \n",
             ),
-        ]
+        ],
     )
     def test_critical(self, msg, args, kwargs, out, std_proxy_logger):
         std_proxy_logger.setLevel(logging.CRITICAL)
         std_proxy_logger.critical(msg, *args, **kwargs)
 
         # .out and .err monkey-patched in at fixture
-        assert std_proxy_logger.out.getvalue() == ''
+        assert std_proxy_logger.out.getvalue() == ""
         assert std_proxy_logger.err.getvalue() == out
 
     def test_log(self, std_proxy_logger):
         std_proxy_logger.setLevel(logging.DEBUG)
-        std_proxy_logger.log(logging.INFO, 'message')
+        std_proxy_logger.log(logging.INFO, "message")
 
         # .out and .err monkey-patched in at fixture
-        assert std_proxy_logger.out.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='message' \n"  # noqa
-        assert std_proxy_logger.err.getvalue() == ''
+        assert (
+            std_proxy_logger.out.getvalue()
+            == "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='message' \n"
+        )  # noqa
+        assert std_proxy_logger.err.getvalue() == ""
 
     def test_log_below_debug(self, std_proxy_logger):
         std_proxy_logger.setLevel(logging.NOTSET)
-        std_proxy_logger.log(5, 'message')
+        std_proxy_logger.log(5, "message")
 
         # .out and .err monkey-patched in at fixture
-        assert std_proxy_logger.out.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='trace' event='message' \n"  # noqa
-        assert std_proxy_logger.err.getvalue() == ''
+        assert (
+            std_proxy_logger.out.getvalue()
+            == "timestamp='2020-01-01T00:00:00Z' logger='test' level='trace' event='message' \n"
+        )  # noqa
+        assert std_proxy_logger.err.getvalue() == ""
 
     def test_log_above_critical(self, std_proxy_logger):
         std_proxy_logger.setLevel(logging.DEBUG)
-        std_proxy_logger.log(30000, 'message')
+        std_proxy_logger.log(30000, "message")
 
         # .out and .err monkey-patched in at fixture
-        assert std_proxy_logger.out.getvalue() == ''
-        assert std_proxy_logger.err.getvalue() == "timestamp='2020-01-01T00:00:00Z' logger='test' level='critical' event='message' \n"  # noqa
+        assert std_proxy_logger.out.getvalue() == ""
+        assert (
+            std_proxy_logger.err.getvalue()
+            == "timestamp='2020-01-01T00:00:00Z' logger='test' level='critical' event='message' \n"
+        )  # noqa
 
 
-@mock.patch('containerlog.proxy.std._patch_all')
+@mock.patch("containerlog.proxy.std._patch_all")
 def test_patch_no_loggers(mock_patch):
     std.patch()
 
     mock_patch.assert_called_once()
 
 
-@mock.patch('containerlog.proxy.std._patch_logger')
+@mock.patch("containerlog.proxy.std._patch_logger")
 def test_patch_with_loggers(mock_patch):
     # put some loggers into the manager for the test.
-    logging.Logger.manager.loggerDict['test-logger-abc'] = logging.Logger('test-logger-abc')
-    logging.Logger.manager.loggerDict['test-logger-def'] = logging.Logger('test-logger-def')
+    logging.Logger.manager.loggerDict["test-logger-abc"] = logging.Logger(
+        "test-logger-abc"
+    )
+    logging.Logger.manager.loggerDict["test-logger-def"] = logging.Logger(
+        "test-logger-def"
+    )
 
-    std.patch('test-logger-abc', 'test-logger-def')
+    std.patch("test-logger-abc", "test-logger-def")
 
-    mock_patch.assert_has_calls([
-        mock.call('test-logger-abc'),
-        mock.call('test-logger-def'),
-    ])
+    mock_patch.assert_has_calls(
+        [
+            mock.call("test-logger-abc"),
+            mock.call("test-logger-def"),
+        ]
+    )
 
 
-@mock.patch('containerlog.proxy.std._patch_logger')
+@mock.patch("containerlog.proxy.std._patch_logger")
 def test_patch_with_glob_loggers(mock_patch):
     # put some loggers into the manager for the test.
-    logging.Logger.manager.loggerDict['test-logger-abc'] = logging.Logger('test-logger-abc')
-    logging.Logger.manager.loggerDict['test-logger-def'] = logging.Logger('test-logger-def')
+    logging.Logger.manager.loggerDict["test-logger-abc"] = logging.Logger(
+        "test-logger-abc"
+    )
+    logging.Logger.manager.loggerDict["test-logger-def"] = logging.Logger(
+        "test-logger-def"
+    )
 
-    std.patch('test-logger-*')
+    std.patch("test-logger-*")
 
-    mock_patch.assert_has_calls([
-        mock.call('test-logger-abc'),
-        mock.call('test-logger-def'),
-    ])
+    mock_patch.assert_has_calls(
+        [
+            mock.call("test-logger-abc"),
+            mock.call("test-logger-def"),
+        ]
+    )
 
 
-@pytest.mark.usefixtures('reset_logging_manager')
+@pytest.mark.usefixtures("reset_logging_manager")
 def test_patch_all():
     # we need to create some loggers since this uses a fresh instance of
     # a logging.Manager
-    logging.getLogger('foo')
-    logging.getLogger('foo.bar.baz')
-    logging.getLogger('new-logger')
+    logging.getLogger("foo")
+    logging.getLogger("foo.bar.baz")
+    logging.getLogger("new-logger")
 
     # Verify starting assumptions
     assert logging.Logger.manager.loggerClass is None
@@ -334,7 +420,7 @@ def test_patch_all():
         assert isinstance(logger, std.StdLoggerProxy)
 
 
-global_logger_for_test = logging.getLogger('test-patch-logger')
+global_logger_for_test = logging.getLogger("test-patch-logger")
 global_logger_for_test.setLevel(logging.INFO)
 
 
@@ -343,23 +429,28 @@ def test_patch_logger():
     # and in the logging manager, and it is a logging.Logger.
     assert isinstance(global_logger_for_test, logging.Logger)
     assert global_logger_for_test.level == logging.INFO
-    assert 'test-patch-logger' in logging.Logger.manager.loggerDict
-    assert isinstance(logging.Logger.manager.loggerDict['test-patch-logger'], logging.Logger)
+    assert "test-patch-logger" in logging.Logger.manager.loggerDict
+    assert isinstance(
+        logging.Logger.manager.loggerDict["test-patch-logger"], logging.Logger
+    )
 
     # Patch the logger to use the StdLoggerProxy.
-    std._patch_logger('test-patch-logger')
+    std._patch_logger("test-patch-logger")
 
     # Check that it was patched.
     assert global_logger_for_test.__class__ == std.StdLoggerProxy
     assert isinstance(global_logger_for_test, std.StdLoggerProxy)
     assert global_logger_for_test.level == logging.INFO
     assert global_logger_for_test.containerlog.level == containerlog.INFO
-    assert 'test-patch-logger' in logging.Logger.manager.loggerDict
-    assert isinstance(logging.Logger.manager.loggerDict['test-patch-logger'], std.StdLoggerProxy)
+    assert "test-patch-logger" in logging.Logger.manager.loggerDict
+    assert isinstance(
+        logging.Logger.manager.loggerDict["test-patch-logger"], std.StdLoggerProxy
+    )
 
 
 @pytest.mark.parametrize(
-    'level,expected', [
+    "level,expected",
+    [
         (-1, containerlog.TRACE),
         (logging.NOTSET, containerlog.TRACE),
         (5, containerlog.TRACE),
@@ -372,24 +463,25 @@ def test_patch_logger():
         (logging.FATAL, containerlog.CRITICAL),
         (1234, containerlog.CRITICAL),
         (25, 90),
-    ]
+    ],
 )
 def test_map_level(level, expected):
     assert expected == std._map_level(level)
 
 
 @pytest.mark.parametrize(
-    'level,expected', [
-        (0, 'trace'),
-        (5, 'trace'),
-        (logging.DEBUG, 'debug'),
-        (logging.INFO, 'info'),
-        (logging.WARN, 'warning'),
-        (logging.WARNING, 'warning'),
-        (logging.ERROR, 'error'),
-        (logging.FATAL, 'critical'),
-        (logging.CRITICAL, 'critical'),
-        (60, 'critical'),
+    "level,expected",
+    [
+        (0, "trace"),
+        (5, "trace"),
+        (logging.DEBUG, "debug"),
+        (logging.INFO, "info"),
+        (logging.WARN, "warning"),
+        (logging.WARNING, "warning"),
+        (logging.ERROR, "error"),
+        (logging.FATAL, "critical"),
+        (logging.CRITICAL, "critical"),
+        (60, "critical"),
     ],
 )
 def test_get_level_name(level, expected):

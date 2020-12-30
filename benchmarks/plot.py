@@ -30,42 +30,50 @@ def normalize_data(data: List[str]) -> Dict[str, Tuple[float, float]]:
     results = {}
     for line in data:
         # if the line is just a bunch of dots, skip it
-        if line.startswith('.'):
+        if line.startswith("."):
             continue
 
-        parts = line.split(':')
+        parts = line.split(":")
         if len(parts) != 3:
-            raise ValueError('invalid input: format of benchmark data does not match expected')
+            raise ValueError(
+                "invalid input: format of benchmark data does not match expected"
+            )
 
         name = parts[0]
         values = parts[2]
 
-        measurements = values.split('+-')
+        measurements = values.split("+-")
         if len(measurements) != 2:
-            raise ValueError('invalid input: format of measurement does not match expected')
+            raise ValueError(
+                "invalid input: format of measurement does not match expected"
+            )
 
-        mean = measurements[0].replace('\n', '').lstrip(' ').rstrip(' ')
-        stddev = measurements[1].replace('\n', '').lstrip(' ').rstrip(' ')
+        mean = measurements[0].replace("\n", "").lstrip(" ").rstrip(" ")
+        stddev = measurements[1].replace("\n", "").lstrip(" ").rstrip(" ")
 
-        mean_val, mean_unit = mean.split(' ')
-        stddev_val, stddev_unit = stddev.split(' ')
+        mean_val, mean_unit = mean.split(" ")
+        stddev_val, stddev_unit = stddev.split(" ")
 
         # If measures in microseconds, convert to nanoseconds
         mean_val = float(mean_val)
-        if mean_unit == 'ns':
+        if mean_unit == "ns":
             pass
-        elif mean_unit == 'us':
+        elif mean_unit == "us":
             mean_val *= 1000
         else:
-            raise ValueError(f'unsupported unit for mean while converting to ns: "{mean_unit}"')
+            raise ValueError(
+                f'unsupported unit for mean while converting to ns: "{mean_unit}"'
+            )
 
         stddev_val = float(stddev_val)
-        if stddev_unit == 'ns':
+        if stddev_unit == "ns":
             pass
-        elif stddev_unit == 'us':
+        elif stddev_unit == "us":
             stddev_val *= 1000
         else:
-            raise ValueError(f'unsupported unit for stddev while converting to ns: "{stddev_unit}"')
+            raise ValueError(
+                f'unsupported unit for stddev while converting to ns: "{stddev_unit}"'
+            )
 
         results[name] = (mean_val, stddev_val)
     return results
@@ -85,17 +93,19 @@ def make_table(
         cntr: Normalized data from benchmarking the containerlog logger.
         std_proxy: Normalized data from benchmarking the StdLoggerProxy logger.
     """
-    assert std.keys() == cntr.keys(), f'std={std.keys()} cntr={cntr.keys()}'
+    assert std.keys() == cntr.keys(), f"std={std.keys()} cntr={cntr.keys()}"
 
     rows = [
-        '| Benchmark | std logger (ns) | std proxy (ns) | containerlog (ns) |',
-        '| --------- | --------------- | -------------- | ----------------- |',
+        "| Benchmark | std logger (ns) | std proxy (ns) | containerlog (ns) |",
+        "| --------- | --------------- | -------------- | ----------------- |",
     ]
     for k in std.keys():
-        rows.append(f'| {k} | {std[k][0]} +/- {std[k][1]} | {std_proxy[k][0]} +/- {std_proxy[k][1]} | {cntr[k][0]} +/- {cntr[k][1]} |')
+        rows.append(
+            f"| {k} | {std[k][0]} +/- {std[k][1]} | {std_proxy[k][0]} +/- {std_proxy[k][1]} | {cntr[k][0]} +/- {cntr[k][1]} |"
+        )
 
-    with open(f'benchmark-containerlog-{version}.md', 'w') as f:
-        f.write('\n'.join(rows))
+    with open(f"benchmark-containerlog-{version}.md", "w") as f:
+        f.write("\n".join(rows))
 
 
 def make_plot(
@@ -112,7 +122,7 @@ def make_plot(
         cntr: Normalized data from benchmarking the containerlog logger.
         std_proxy: Normalized data from benchmarking the StdLoggerProxy logger.
     """
-    assert std.keys() == cntr.keys(), f'std={std.keys()} cntr={cntr.keys()}'
+    assert std.keys() == cntr.keys(), f"std={std.keys()} cntr={cntr.keys()}"
 
     labels = list(std.keys())
     std_means = [std[k][0] for k in labels]
@@ -126,12 +136,30 @@ def make_plot(
     width = 0.25
 
     fig, ax = plt.subplots()
-    ax.bar(list(map(lambda i: i - width, x)), std_means, width, yerr=std_err, label='std logger')
-    ax.bar(list(map(lambda i: i, x)), std_proxy_means, width, yerr=std_proxy_err, label='std proxy')
-    ax.bar(list(map(lambda i: i + width, x)), cntr_means, width, yerr=cntr_err, label='containerlog')
+    ax.bar(
+        list(map(lambda i: i - width, x)),
+        std_means,
+        width,
+        yerr=std_err,
+        label="std logger",
+    )
+    ax.bar(
+        list(map(lambda i: i, x)),
+        std_proxy_means,
+        width,
+        yerr=std_proxy_err,
+        label="std proxy",
+    )
+    ax.bar(
+        list(map(lambda i: i + width, x)),
+        cntr_means,
+        width,
+        yerr=cntr_err,
+        label="containerlog",
+    )
 
-    ax.set_ylabel('execution time (ns)')
-    ax.set_title(f'Benchmark results for containerlog v{version}')
+    ax.set_ylabel("execution time (ns)")
+    ax.set_title(f"Benchmark results for containerlog v{version}")
     ax.set_xticks(x)
     ax.set_xticklabels(labels)
     ax.legend()
@@ -139,25 +167,25 @@ def make_plot(
     fig.tight_layout()
     fig.subplots_adjust(bottom=0.2)
     plt.xticks(rotation=45)
-    plt.savefig(f'benchmark-containerlog-{version}.png')
+    plt.savefig(f"benchmark-containerlog-{version}.png")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Get the version of containerlog being tested. If not passed in
     # as an arg, default to '???'
     if len(sys.argv) == 2:
         containerlog_version = sys.argv[1]
     else:
-        containerlog_version = '???'
+        containerlog_version = "???"
 
     # Open the results files and load the data.
-    with open('std_results.txt', 'r') as f:
+    with open("std_results.txt", "r") as f:
         std_results = f.readlines()
 
-    with open('containerlog_results.txt', 'r') as f:
+    with open("containerlog_results.txt", "r") as f:
         containerlog_results = f.readlines()
 
-    with open('std_proxy_results.txt', 'r') as f:
+    with open("std_proxy_results.txt", "r") as f:
         std_proxy_results = f.readlines()
 
     # Normalize the output data from file.

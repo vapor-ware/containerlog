@@ -8,7 +8,7 @@ import pytest
 import containerlog
 
 
-@pytest.fixture(scope='function', autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 def reset_manager():
     """Fixture to reset the module Manager after each test."""
     yield
@@ -20,7 +20,7 @@ def test_logger():
     """Fixture to get an instance of a Logger with mocked proxy module functions."""
     err = io.StringIO()
     out = io.StringIO()
-    log = containerlog.Logger(name='test')
+    log = containerlog.Logger(name="test")
 
     log.utcnow = lambda: datetime.datetime(2020, 1, 1)
     log.writeout = out.write

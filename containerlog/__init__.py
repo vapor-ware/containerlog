@@ -14,13 +14,15 @@ import traceback
 from typing import Dict, Optional
 
 # Project attributes
-__title__ = 'containerlog'
-__version__ = '0.3.1'
-__description__ = 'Optimized, opinionated structured logging for containerized applications.'
-__author__ = 'Erick Daniszewski'
-__author_email__ = 'erick@vapor.io'
-__url__ = 'https://github.com/vapor-ware/containerlog'
-__license__ = 'GNU General Public License v3.0'
+__title__ = "containerlog"
+__version__ = "0.3.1"
+__description__ = (
+    "Optimized, opinionated structured logging for containerized applications."
+)
+__author__ = "Erick Daniszewski"
+__author_email__ = "erick@vapor.io"
+__url__ = "https://github.com/vapor-ware/containerlog"
+__license__ = "GNU General Public License v3.0"
 
 # Log levels are defined as integers. This allows quick and easy level
 # comparisons (greater than, less than, equal to).
@@ -49,21 +51,21 @@ class Logger:
     """
 
     __slots__ = (
-        'name',
-        'level',
-        'utcnow',
-        'writeout',
-        'writeerr',
-        '_previous_level',
+        "name",
+        "level",
+        "utcnow",
+        "writeout",
+        "writeerr",
+        "_previous_level",
     )
 
     _level_lookup = (
-        'trace',
-        'debug',
-        'info',
-        'warn',
-        'error',
-        'critical',
+        "trace",
+        "debug",
+        "info",
+        "warn",
+        "error",
+        "critical",
     )
 
     def __init__(self, name: str, level: Optional[int] = None) -> None:
@@ -125,18 +127,18 @@ class Logger:
         # dict so the colliding key is prefixed with an underscore. This is
         # done one at a time instead of a loop, as this was measured to be
         # slightly more performant.
-        if 'timestamp' in kwargs:
-            kwargs['_timestamp'] = kwargs['timestamp']
-            del kwargs['timestamp']
-        if 'logger' in kwargs:
-            kwargs['_logger'] = kwargs['logger']
-            del kwargs['logger']
-        if 'level' in kwargs:
-            kwargs['_level'] = kwargs['level']
-            del kwargs['level']
-        if 'event' in kwargs:
-            kwargs['_event'] = kwargs['event']
-            del kwargs['event']
+        if "timestamp" in kwargs:
+            kwargs["_timestamp"] = kwargs["timestamp"]
+            del kwargs["timestamp"]
+        if "logger" in kwargs:
+            kwargs["_logger"] = kwargs["logger"]
+            del kwargs["logger"]
+        if "level" in kwargs:
+            kwargs["_level"] = kwargs["level"]
+            del kwargs["level"]
+        if "event" in kwargs:
+            kwargs["_event"] = kwargs["event"]
+            del kwargs["event"]
 
         # For extra kv items, if the value is a string, wrap it in single quotes.
         # Otherwise let the object's __str__ or __repr__ deal with it.
@@ -146,7 +148,7 @@ class Logger:
             return v
 
         # Format the log message entry.
-        extras = ' '.join(f"{k}={fmt_val(v)}" for k, v in kwargs.items())
+        extras = " ".join(f"{k}={fmt_val(v)}" for k, v in kwargs.items())
         entry = f"timestamp='{self.utcnow().isoformat('T')}Z' logger='{self.name}' level='{self._level_lookup[loglevel]}' event='{msg}' {extras}\n"  # noqa
 
         if exc:
@@ -155,8 +157,8 @@ class Logger:
             traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], None, buf)
             s = buf.getvalue()
             buf.close()
-            if s[-1] != '\n':
-                s += '\n'
+            if s[-1] != "\n":
+                s += "\n"
             entry += s
 
         # Log to stderr if at level error or greater, otherwise log to stdout.
@@ -239,8 +241,8 @@ class Manager:
     """
 
     __slots__ = (
-        'level',
-        'loggers',
+        "level",
+        "loggers",
     )
 
     def __init__(self, level: int = DEBUG) -> None:
@@ -286,20 +288,20 @@ def _caller_name(skip=2):
     stack = inspect.stack()
     start = 0 + skip
     if len(stack) < start + 1:
-        return ''
+        return ""
     pframe = stack[start][0]
 
     name = []
     mod = inspect.getmodule(pframe)
     if mod:
         name.append(mod.__name__)
-    if 'self' in pframe.f_locals:
-        name.append(pframe.f_locals['self'].__class__.__name__)
+    if "self" in pframe.f_locals:
+        name.append(pframe.f_locals["self"].__class__.__name__)
     codename = pframe.f_code.co_name
-    if codename != '<module>':
+    if codename != "<module>":
         name.append(codename)
     del pframe
-    return '.'.join(name)
+    return ".".join(name)
 
 
 def get_logger(name: Optional[str] = None) -> Logger:

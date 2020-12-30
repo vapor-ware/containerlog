@@ -8,7 +8,6 @@ import containerlog.proxy.std
 
 
 class Custom:
-
     def __init__(self):
         self.val = 1
 
@@ -16,19 +15,24 @@ class Custom:
         return self.__str__()
 
     def __str__(self):
-        return f'<Custom Object: {self.val}>'
+        return f"<Custom Object: {self.val}>"
 
 
-MSG_BASIC = 'some message to log'
-MSG_FORMAT_SHORT_SIMPLE = 'a formatted message str=%s'
-MSG_FORMAT_LONG_SIMPLE = 'a formatted message bool=%s str=%s int=%d float=%d'
-MSG_FORMAT_SHORT_COMPLEX = 'a formatted message obj=%s'
-MSG_FORMAT_LONG_COMPLEX = 'a formatted message obj=%s list=%s dict=%s tuple=%s'
+MSG_BASIC = "some message to log"
+MSG_FORMAT_SHORT_SIMPLE = "a formatted message str=%s"
+MSG_FORMAT_LONG_SIMPLE = "a formatted message bool=%s str=%s int=%d float=%d"
+MSG_FORMAT_SHORT_COMPLEX = "a formatted message obj=%s"
+MSG_FORMAT_LONG_COMPLEX = "a formatted message obj=%s list=%s dict=%s tuple=%s"
 
-SHORT_ARGS_SIMPLE = ['example']
-LONG_ARGS_SIMPLE = [True, 'example', 10, 0.131]
+SHORT_ARGS_SIMPLE = ["example"]
+LONG_ARGS_SIMPLE = [True, "example", 10, 0.131]
 SHORT_ARGS_COMPLEX = [Custom()]
-LONG_ARGS_COMPLEX = [Custom(), [Custom(), Custom()], {'a': Custom(), 'b': Custom}, (Custom(), Custom())]
+LONG_ARGS_COMPLEX = [
+    Custom(),
+    [Custom(), Custom()],
+    {"a": Custom(), "b": Custom},
+    (Custom(), Custom()),
+]
 
 
 def bench_baseline(loops, logger):
@@ -195,26 +199,26 @@ def bench_exception(loops, logger):
 
 
 BENCHMARKS = {
-    'baseline': bench_baseline,
-    'silent': bench_silent,
-    'basic': bench_basic,
-    'short-simple': bench_short_simple,
-    'long-simple': bench_long_simple,
-    'short-complex': bench_short_complex,
-    'long-complex': bench_long_complex,
-    'exception': bench_exception,
+    "baseline": bench_baseline,
+    "silent": bench_silent,
+    "basic": bench_basic,
+    "short-simple": bench_short_simple,
+    "long-simple": bench_long_simple,
+    "short-complex": bench_short_complex,
+    "long-complex": bench_long_complex,
+    "exception": bench_exception,
 }
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     runner = pyperf.Runner()
-    runner.metadata['description'] = 'Test the performance of Python standard logger.'
+    runner.metadata["description"] = "Test the performance of Python standard logger."
 
     # Note: StringIO performance will impact the results
     stream = io.StringIO()
 
     # Setup the logger
-    proxy_log = containerlog.proxy.std.StdLoggerProxy('bench-std-proxy')
+    proxy_log = containerlog.proxy.std.StdLoggerProxy("bench-std-proxy")
     proxy_log.level = containerlog.WARN
     proxy_log.writeout = stream.write
     proxy_log.writeerr = stream.write
