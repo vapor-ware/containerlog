@@ -13,7 +13,7 @@ clean:  ## Clean up build artifacts
 		containerlog/__pycache__ tests/__pycache__ site/
 
 fmt:  ## Automatic source code formatting
-	tox -e fmt
+	pre-commit run --all-files
 
 github-tag:  ## Create and push a GitHub tag with the current version
 	git tag -a ${PKG_VERSION} -m "${PKG_NAME} version ${PKG_VERSION}"
