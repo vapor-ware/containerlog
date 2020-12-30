@@ -35,18 +35,14 @@ def normalize_data(data: List[str]) -> Dict[str, Tuple[float, float]]:
 
         parts = line.split(":")
         if len(parts) != 3:
-            raise ValueError(
-                "invalid input: format of benchmark data does not match expected"
-            )
+            raise ValueError("invalid input: format of benchmark data does not match expected")
 
         name = parts[0]
         values = parts[2]
 
         measurements = values.split("+-")
         if len(measurements) != 2:
-            raise ValueError(
-                "invalid input: format of measurement does not match expected"
-            )
+            raise ValueError("invalid input: format of measurement does not match expected")
 
         mean = measurements[0].replace("\n", "").lstrip(" ").rstrip(" ")
         stddev = measurements[1].replace("\n", "").lstrip(" ").rstrip(" ")
@@ -61,9 +57,7 @@ def normalize_data(data: List[str]) -> Dict[str, Tuple[float, float]]:
         elif mean_unit == "us":
             mean_val *= 1000
         else:
-            raise ValueError(
-                f'unsupported unit for mean while converting to ns: "{mean_unit}"'
-            )
+            raise ValueError(f'unsupported unit for mean while converting to ns: "{mean_unit}"')
 
         stddev_val = float(stddev_val)
         if stddev_unit == "ns":
@@ -71,9 +65,7 @@ def normalize_data(data: List[str]) -> Dict[str, Tuple[float, float]]:
         elif stddev_unit == "us":
             stddev_val *= 1000
         else:
-            raise ValueError(
-                f'unsupported unit for stddev while converting to ns: "{stddev_unit}"'
-            )
+            raise ValueError(f'unsupported unit for stddev while converting to ns: "{stddev_unit}"')
 
         results[name] = (mean_val, stddev_val)
     return results

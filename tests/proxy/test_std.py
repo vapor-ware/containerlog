@@ -353,12 +353,8 @@ def test_patch_no_loggers(mock_patch):
 @mock.patch("containerlog.proxy.std._patch_logger")
 def test_patch_with_loggers(mock_patch):
     # put some loggers into the manager for the test.
-    logging.Logger.manager.loggerDict["test-logger-abc"] = logging.Logger(
-        "test-logger-abc"
-    )
-    logging.Logger.manager.loggerDict["test-logger-def"] = logging.Logger(
-        "test-logger-def"
-    )
+    logging.Logger.manager.loggerDict["test-logger-abc"] = logging.Logger("test-logger-abc")
+    logging.Logger.manager.loggerDict["test-logger-def"] = logging.Logger("test-logger-def")
 
     std.patch("test-logger-abc", "test-logger-def")
 
@@ -373,12 +369,8 @@ def test_patch_with_loggers(mock_patch):
 @mock.patch("containerlog.proxy.std._patch_logger")
 def test_patch_with_glob_loggers(mock_patch):
     # put some loggers into the manager for the test.
-    logging.Logger.manager.loggerDict["test-logger-abc"] = logging.Logger(
-        "test-logger-abc"
-    )
-    logging.Logger.manager.loggerDict["test-logger-def"] = logging.Logger(
-        "test-logger-def"
-    )
+    logging.Logger.manager.loggerDict["test-logger-abc"] = logging.Logger("test-logger-abc")
+    logging.Logger.manager.loggerDict["test-logger-def"] = logging.Logger("test-logger-def")
 
     std.patch("test-logger-*")
 
@@ -430,9 +422,7 @@ def test_patch_logger():
     assert isinstance(global_logger_for_test, logging.Logger)
     assert global_logger_for_test.level == logging.INFO
     assert "test-patch-logger" in logging.Logger.manager.loggerDict
-    assert isinstance(
-        logging.Logger.manager.loggerDict["test-patch-logger"], logging.Logger
-    )
+    assert isinstance(logging.Logger.manager.loggerDict["test-patch-logger"], logging.Logger)
 
     # Patch the logger to use the StdLoggerProxy.
     std._patch_logger("test-patch-logger")
@@ -443,9 +433,7 @@ def test_patch_logger():
     assert global_logger_for_test.level == logging.INFO
     assert global_logger_for_test.containerlog.level == containerlog.INFO
     assert "test-patch-logger" in logging.Logger.manager.loggerDict
-    assert isinstance(
-        logging.Logger.manager.loggerDict["test-patch-logger"], std.StdLoggerProxy
-    )
+    assert isinstance(logging.Logger.manager.loggerDict["test-patch-logger"], std.StdLoggerProxy)
 
 
 @pytest.mark.parametrize(
