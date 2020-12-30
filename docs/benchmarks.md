@@ -22,7 +22,7 @@ Results are measured in nanoseconds. The smaller number is better.
 Note that in the results below:
 !!! note
     In the results below:
-    
+
     - *"std logger"* refers to the Python standard logger (`import logging`)
     - *"std proxy"* refers to the containerlog proxy for the Python standard logger (`import containerlog.proxy.std`)
     - *"containerlog"* refers to the core containerlog logger implementation (`import containerlog`)
@@ -54,4 +54,3 @@ The proxy logger uses the core containerlog logger under the covers, so their be
 | short-complex | 5430.0 +/- 200.0 | 1450.0 +/- 60.0 | **1370.0** +/- 50.0 |
 | long-complex | 6590.0 +/- 140.0 | **2770.0** +/- 60.0 | 3160.0 +/- 100.0 |
 | exception | 10000.0 +/- 400.0 | 4330.0 +/- 120.0 | **4050.0** +/- 170.0 |
-

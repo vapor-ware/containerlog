@@ -23,7 +23,7 @@ def std_proxy_logger():
     """Fixture to get an instance of a Logger with mocked proxy module functions."""
     err = io.StringIO()
     out = io.StringIO()
-    log = std.StdLoggerProxy(name='test')
+    log = std.StdLoggerProxy(name="test")
 
     log.containerlog.utcnow = lambda: datetime.datetime(2020, 1, 1)
     log.writeout = out.write

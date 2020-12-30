@@ -55,7 +55,7 @@ Re-running the same command as before, you should now see log output similar to:
 
 ```
 timestamp='2020-07-24T15:36:00.981228Z' logger='uvicorn.error' level='info' event='Started server process [99395]' color_message='Started server process [%d]'
-timestamp='2020-07-24T15:36:00.981435Z' logger='uvicorn.error' level='info' event='Waiting for application startup.' 
-timestamp='2020-07-24T15:36:00.981634Z' logger='uvicorn.error' level='info' event='Application startup complete.' 
+timestamp='2020-07-24T15:36:00.981435Z' logger='uvicorn.error' level='info' event='Waiting for application startup.'
+timestamp='2020-07-24T15:36:00.981634Z' logger='uvicorn.error' level='info' event='Application startup complete.'
 timestamp='2020-07-24T15:36:00.982344Z' logger='uvicorn.error' level='info' event='Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)' color_message='Uvicorn running on %s://%s:%d (Press CTRL+C to quit)'
 ```

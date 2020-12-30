@@ -8,7 +8,6 @@ import containerlog
 
 
 class Custom:
-
     def __init__(self):
         self.val = 1
 
@@ -16,16 +15,21 @@ class Custom:
         return self.__str__()
 
     def __str__(self):
-        return f'<Custom Object: {self.val}>'
+        return f"<Custom Object: {self.val}>"
 
 
-MSG_BASIC = 'some message to log'
-MSG_FORMATTED = 'a formatted message'
+MSG_BASIC = "some message to log"
+MSG_FORMATTED = "a formatted message"
 
-SHORT_ARGS_SIMPLE = {'str': 'example'}
-LONG_ARGS_SIMPLE = {'bool': True, 'str': 'example', 'int': 10, 'float': 0.131}
-SHORT_ARGS_COMPLEX = {'obj': Custom()}
-LONG_ARGS_COMPLEX = {'obj': Custom(), 'list': [Custom(), Custom()], 'dict': {'a': Custom(), 'b': Custom}, 'tuple': (Custom(), Custom())}
+SHORT_ARGS_SIMPLE = {"str": "example"}
+LONG_ARGS_SIMPLE = {"bool": True, "str": "example", "int": 10, "float": 0.131}
+SHORT_ARGS_COMPLEX = {"obj": Custom()}
+LONG_ARGS_COMPLEX = {
+    "obj": Custom(),
+    "list": [Custom(), Custom()],
+    "dict": {"a": Custom(), "b": Custom},
+    "tuple": (Custom(), Custom()),
+}
 
 
 def bench_baseline(loops, logger):
@@ -192,26 +196,26 @@ def bench_exception(loops, logger):
 
 
 BENCHMARKS = {
-    'baseline': bench_baseline,
-    'silent': bench_silent,
-    'basic': bench_basic,
-    'short-simple': bench_short_simple,
-    'long-simple': bench_long_simple,
-    'short-complex': bench_short_complex,
-    'long-complex': bench_long_complex,
-    'exception': bench_exception,
+    "baseline": bench_baseline,
+    "silent": bench_silent,
+    "basic": bench_basic,
+    "short-simple": bench_short_simple,
+    "long-simple": bench_long_simple,
+    "short-complex": bench_short_complex,
+    "long-complex": bench_long_complex,
+    "exception": bench_exception,
 }
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     runner = pyperf.Runner()
-    runner.metadata['description'] = 'Test the performance of containerlog.'
+    runner.metadata["description"] = "Test the performance of containerlog."
 
     # Note: StringIO performance will impact the results
     stream = io.StringIO()
 
     # Setup the logger
-    log = containerlog.get_logger('bench-containerlog')
+    log = containerlog.get_logger("bench-containerlog")
     log.level = containerlog.WARN
     log.writeout = stream.write
     log.writeerr = stream.write

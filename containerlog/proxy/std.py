@@ -10,8 +10,8 @@ from typing import Union
 import containerlog
 
 __all__ = [
-    'patch',
-    'StdLoggerProxy',
+    "patch",
+    "StdLoggerProxy",
 ]
 
 
@@ -153,10 +153,10 @@ def _normalize_level(level: Union[str, int]) -> int:
         rv = level
     elif str(level) == level:
         if level.upper() not in logging._nameToLevel:
-            raise ValueError(f'Unknown logging level: {level}')
+            raise ValueError(f"Unknown logging level: {level}")
         rv = logging._nameToLevel[level.upper()]
     else:
-        raise TypeError(f'Level not an integer or a valid string: {level}')
+        raise TypeError(f"Level not an integer or a valid string: {level}")
     return rv
 
 
@@ -206,8 +206,8 @@ class StdLoggerProxy(Logger):
         logger.
         """
         extras = {}
-        if 'extra' in kwargs:
-            extras = kwargs['extra']
+        if "extra" in kwargs:
+            extras = kwargs["extra"]
         if args:
             msg = msg % args
         self.containerlog.trace(msg, **extras)
@@ -215,8 +215,8 @@ class StdLoggerProxy(Logger):
     def debug(self, msg, *args, **kwargs):
         """Log a message at DEBUG level."""
         extras = {}
-        if 'extra' in kwargs:
-            extras = kwargs['extra']
+        if "extra" in kwargs:
+            extras = kwargs["extra"]
         if args:
             msg = msg % args
         self.containerlog.debug(msg, **extras)
@@ -224,8 +224,8 @@ class StdLoggerProxy(Logger):
     def info(self, msg, *args, **kwargs):
         """Log a message at INFO level."""
         extras = {}
-        if 'extra' in kwargs:
-            extras = kwargs['extra']
+        if "extra" in kwargs:
+            extras = kwargs["extra"]
         if args:
             msg = msg % args
         self.containerlog.info(msg, **extras)
@@ -233,8 +233,8 @@ class StdLoggerProxy(Logger):
     def warning(self, msg, *args, **kwargs):
         """Log a message at WARN level."""
         extras = {}
-        if 'extra' in kwargs:
-            extras = kwargs['extra']
+        if "extra" in kwargs:
+            extras = kwargs["extra"]
         if args:
             msg = msg % args
         self.containerlog.warn(msg, **extras)
@@ -244,8 +244,8 @@ class StdLoggerProxy(Logger):
     def error(self, msg, *args, **kwargs):
         """Log a message at ERROR level."""
         extras = {}
-        if 'extra' in kwargs:
-            extras = kwargs['extra']
+        if "extra" in kwargs:
+            extras = kwargs["extra"]
         if args:
             msg = msg % args
         self.containerlog.error(msg, **extras)
@@ -253,8 +253,8 @@ class StdLoggerProxy(Logger):
     def exception(self, msg, *args, **kwargs):
         """Log a message at ERROR level with exception traceback."""
         extras = {}
-        if 'extra' in kwargs:
-            extras = kwargs['extra']
+        if "extra" in kwargs:
+            extras = kwargs["extra"]
         if args:
             msg = msg % args
         self.containerlog.exception(msg, **extras)
@@ -262,8 +262,8 @@ class StdLoggerProxy(Logger):
     def critical(self, msg, *args, **kwargs):
         """Log a message at CRITICAL level."""
         extras = {}
-        if 'extra' in kwargs:
-            extras = kwargs['extra']
+        if "extra" in kwargs:
+            extras = kwargs["extra"]
         if args:
             msg = msg % args
         self.containerlog.critical(msg, **extras)
@@ -283,9 +283,9 @@ def _get_level_name(level):
     on the logging log level provided.
     """
     if level < logging.DEBUG:
-        return 'trace'
+        return "trace"
     if level > logging.CRITICAL:
-        return 'critical'
+        return "critical"
 
     name = logging._levelToName.get(level)
     if not name:

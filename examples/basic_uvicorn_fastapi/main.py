@@ -23,9 +23,10 @@ should see logs similar to the following, which includes the trace-level logging
     timestamp='2020-12-16T13:09:00.202050Z' logger='uvicorn.error' level='trace' event='127.0.0.1:56623 - Connection lost'
 """
 
+from fastapi import FastAPI, Request
+
 import containerlog
 from containerlog.proxy.std import patch
-from fastapi import FastAPI, Request
 
 logger = containerlog.get_logger()
 containerlog.set_level(containerlog.TRACE)
@@ -36,7 +37,7 @@ app = FastAPI()
 patch()
 
 
-@app.get('/')
+@app.get("/")
 async def root(request: Request):
-    logger.info('processing request', method=request.method, url=request.url)
-    return {'status': 'ok'}
+    logger.info("processing request", method=request.method, url=request.url)
+    return {"status": "ok"}

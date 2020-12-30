@@ -23,7 +23,7 @@ Not every application needs optimized logging, but where latency and performance
 
 ```
 timestamp='2020-07-23T13:11:28.009804Z' logger='my-logger' level='debug' event='loading configuration' path='./config.yaml'
-timestamp='2020-07-23T13:11:28.010137Z' logger='my-logger' level='info' event='starting application' 
+timestamp='2020-07-23T13:11:28.010137Z' logger='my-logger' level='info' event='starting application'
 timestamp='2020-07-23T13:11:28.010158Z' logger='my-logger' level='warn' event='having too much fun' countdown=[3, 2, 1]
 ```
 
@@ -47,7 +47,7 @@ There are numerous sources discussion micro-optimizations in Python. This projec
 does not implement them all, so there is room for improvement. Current optimization work has
 leveraged:
 
-* [`dis`](https://docs.python.org/3/library/dis.html): to disassemble python bytecode for analysis 
+* [`dis`](https://docs.python.org/3/library/dis.html): to disassemble python bytecode for analysis
 * [`timeit`](https://docs.python.org/3/library/timeit.html): to measure execution time of code snippets
 
 If you wish to contribute optimizations and use other libraries, tools, or sources, open a PR to add
@@ -88,4 +88,3 @@ processor and 16 GB 2400 MHz DDR4 memory.
 While `containerlog` is intentionally feature-sparse, feature requests are welcome. Additionally,
 if you can find any other ways to micro-optimize the codebase, pull requests are very much
 appreciated.
-
