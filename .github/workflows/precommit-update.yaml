@@ -1,0 +1,29 @@
+name: Auto-update pre-commit tools
+on:
+  schedule:
+    - cron: '0  8  * * 1'
+jobs:
+  auto-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install pre-commit
+        run: pip install pre-commit
+      - name: Autoupdate
+        run: pre-commit autoupdate
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GH_PAT }}
+          commit-message: 'deps: update pre-commit dependency versions'
+          branch: update/pre-commit-deps
+          title: Auto-update for pre-commit dependencies
+          body: |
+            Updates the version(s) of pre-commit tools to their
+            latest version(s).
+          labels: dependencies
