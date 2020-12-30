@@ -12,7 +12,7 @@ here = Path(__file__).parent
 # Load the package metadata from the __init__.py file as a dictionary.
 pkg = {}
 with open(here / "containerlog" / "__init__.py", "r", "utf-8") as f:
-    pkg = {k: v for k, v in re.findall(r"^(__\w+__) = \'(.+)\'", f.read(), re.M)}
+    pkg = {k: v for k, v in re.findall(r"^(__\w+__) = \"(.+)\"", f.read(), re.M)}
 
 # Load the README
 readme = ""
