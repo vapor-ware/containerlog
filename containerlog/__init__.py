@@ -11,7 +11,9 @@ import inspect
 import io
 import sys
 import traceback
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
+
+from . import types
 
 # Project attributes
 __title__ = "containerlog"
@@ -55,6 +57,7 @@ class Logger:
         "writeout",
         "writeerr",
         "_previous_level",
+        "_context",
     )
 
     _level_lookup = (
@@ -70,6 +73,7 @@ class Logger:
         self.name: str = name
         self.level: int = DEBUG if level is None else level
         self._previous_level: Optional[int] = None
+        self._context: Optional[types.Context] = None
 
         # Proxy module functions being used into the class scope. This
         # speeds things up by making what would otherwise be a LOAD_GLOBAL
@@ -77,6 +81,22 @@ class Logger:
         self.utcnow = datetime.datetime.utcnow
         self.writeout = sys.stdout.write
         self.writeerr = sys.stderr.write
+
+    def set_context(self, ctx: types.Context) -> None:
+        """"""
+        self._context = ctx
+
+    def bind(self, **kwargs: Any) -> None:
+        """"""
+        self._context.bind(**kwargs)
+
+    def unbind(self, *keys: str) -> None:
+        """"""
+        self._context.unbind(*keys)
+
+    def clear_context(self) -> None:
+        """"""
+        self._context.clear()
 
     @property
     def disabled(self) -> bool:
@@ -138,6 +158,11 @@ class Logger:
             kwargs["_event"] = kwargs["event"]
             del kwargs["event"]
 
+        fields = {}
+        if self._context:
+            fields = dict(self._context.get())
+        fields.update(kwargs)
+
         # For extra kv items, if the value is a string, wrap it in single quotes.
         # Otherwise let the object's __str__ or __repr__ deal with it.
         def fmt_val(v):
@@ -146,7 +171,7 @@ class Logger:
             return v
 
         # Format the log message entry.
-        extras = " ".join(f"{k}={fmt_val(v)}" for k, v in kwargs.items())
+        extras = " ".join(f"{k}={fmt_val(v)}" for k, v in fields.items())
         entry = f"timestamp='{self.utcnow().isoformat('T')}Z' logger='{self.name}' level='{self._level_lookup[loglevel]}' event='{msg}' {extras}\n"  # noqa
 
         if exc:
@@ -241,11 +266,13 @@ class Manager:
     __slots__ = (
         "level",
         "loggers",
+        "context",
     )
 
     def __init__(self, level: int = DEBUG) -> None:
         self.level: int = level
         self.loggers: Dict[str, Logger] = {}
+        self.context: Optional[types.Context] = None
 
     def set_levels(self) -> None:
         """Set the log level for each tracked logger."""
@@ -256,6 +283,11 @@ class Manager:
 # A global manager instance. This should be the only place Manager
 # is used so there is a central authority on all logger instances.
 manager = Manager()
+
+
+def use_context(ctx: types.Context) -> None:
+    """"""
+    manager.context = ctx
 
 
 def set_level(level: int) -> None:
