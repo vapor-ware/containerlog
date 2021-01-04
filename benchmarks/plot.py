@@ -93,7 +93,7 @@ def make_table(
     ]
     for k in std.keys():
         rows.append(
-            f"| {k} | {std[k][0]} +/- {std[k][1]} | {std_proxy[k][0]} +/- {std_proxy[k][1]} | {cntr[k][0]} +/- {cntr[k][1]} |"
+            f"| {k} | {std[k][0]} +/- {std[k][1]} | {std_proxy[k][0]} +/- {std_proxy[k][1]} | {cntr[k][0]} +/- {cntr[k][1]} |"  # noqa
         )
 
     with open(f"benchmark-containerlog-{version}.md", "w") as f:

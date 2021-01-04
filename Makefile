@@ -2,8 +2,8 @@
 # containerlog
 #
 
-PKG_NAME    := $(shell python setup.py --name)
-PKG_VERSION := $(shell python setup.py --version)
+PKG_NAME    := containerlog
+PKG_VERSION := $(shell poetry version | awk '{print $$2}')
 
 .PHONY: clean fmt github-tag lint version help
 .DEFAULT_GOAL := help
@@ -19,11 +19,13 @@ github-tag:  ## Create and push a GitHub tag with the current version
 	git tag -a ${PKG_VERSION} -m "${PKG_NAME} version ${PKG_VERSION}"
 	git push -u origin ${PKG_VERSION}
 
-lint:  ## Run linting checks on the project source code (isort, flake8, twine check)
-	tox -e lint
+lint:  ## Run linting checks on the project source code
+	poetry run flake8 containerlog tests benchmarks
+	poetry run mypy containerlog
+	poetry check
 
 test:  ## Run the project unit tests
-	tox
+	poetry run pytest -s -vv --cov-report html --cov-report term --cov-fail-under 95 --cov containerlog
 
 version:  ## Print the package version
 	@echo "${PKG_VERSION}"
@@ -35,8 +37,10 @@ help:  ## Print usage information
 # Jenkins CI Pipeline Targets
 .PHONY: unit-test pypi-release
 
-unit-test:
-	tox -e py38
+setup:
+	poetry install
+
+unit-test: test
 
 pypi-release:
 	tox -e release
