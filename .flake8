@@ -1,0 +1,11 @@
+[flake8]
+# W503: Whitespace before ':' (conflicts with black formatting)
+ignore = W503
+select = BLK,E,F,I,W
+max-line-length = 100
+application-import-names = consumer_api,tests
+exclude = bin/,.github/,build/,docs/,.mypy_cache/,.pytest_cache/
+per-file-ignores =
+    # W503 line break before binary operator
+    # E501 line too long
+    tests/*.py: W503,E501
