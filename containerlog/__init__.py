@@ -11,9 +11,10 @@ import inspect
 import io
 import sys
 import traceback
-from typing import Any, Dict, Optional
+from typing import Dict, Iterable, List, Optional
 
 from . import types
+from .types import ContextProcessor
 
 # Project attributes
 __title__ = "containerlog"
@@ -56,8 +57,8 @@ class Logger:
         "utcnow",
         "writeout",
         "writeerr",
+        "context_processors",
         "_previous_level",
-        "_context",
     )
 
     _level_lookup = (
@@ -69,11 +70,17 @@ class Logger:
         "critical",
     )
 
-    def __init__(self, name: str, level: Optional[int] = None) -> None:
+    def __init__(
+        self,
+        name: str,
+        level: Optional[int] = None,
+        processors: Optional[Iterable[ContextProcessor]] = None,
+    ) -> None:
         self.name: str = name
         self.level: int = DEBUG if level is None else level
         self._previous_level: Optional[int] = None
-        self._context: Optional[types.Context] = None
+
+        self.context_processors: Iterable[ContextProcessor] = processors or []
 
         # Proxy module functions being used into the class scope. This
         # speeds things up by making what would otherwise be a LOAD_GLOBAL
@@ -81,22 +88,6 @@ class Logger:
         self.utcnow = datetime.datetime.utcnow
         self.writeout = sys.stdout.write
         self.writeerr = sys.stderr.write
-
-    def set_context(self, ctx: types.Context) -> None:
-        """"""
-        self._context = ctx
-
-    def bind(self, **kwargs: Any) -> None:
-        """"""
-        self._context.bind(**kwargs)
-
-    def unbind(self, *keys: str) -> None:
-        """"""
-        self._context.unbind(*keys)
-
-    def clear_context(self) -> None:
-        """"""
-        self._context.clear()
 
     @property
     def disabled(self) -> bool:
@@ -159,8 +150,9 @@ class Logger:
             del kwargs["event"]
 
         fields = {}
-        if self._context:
-            fields = dict(self._context.get())
+        for processor in self.context_processors:
+            fields.update(processor.get())
+
         fields.update(kwargs)
 
         # For extra kv items, if the value is a string, wrap it in single quotes.
@@ -266,13 +258,14 @@ class Manager:
     __slots__ = (
         "level",
         "loggers",
-        "context",
+        "context_processors",
     )
 
     def __init__(self, level: int = DEBUG) -> None:
         self.level: int = level
         self.loggers: Dict[str, Logger] = {}
-        self.context: Optional[types.Context] = None
+
+        self.context_processors: List[ContextProcessor] = []
 
     def set_levels(self) -> None:
         """Set the log level for each tracked logger."""
@@ -283,11 +276,6 @@ class Manager:
 # A global manager instance. This should be the only place Manager
 # is used so there is a central authority on all logger instances.
 manager = Manager()
-
-
-def use_context(ctx: types.Context) -> None:
-    """"""
-    manager.context = ctx
 
 
 def set_level(level: int) -> None:
@@ -353,6 +341,7 @@ def get_logger(name: Optional[str] = None) -> Logger:
         logger = Logger(
             name=name,
             level=manager.level,
+            processors=manager.context_processors,
         )
         manager.loggers[name] = logger
 
@@ -417,3 +406,34 @@ def enable(*loggers: str) -> None:
             filtered = fnmatch.filter(manager.loggers.keys(), glob)
             for name in filtered:
                 manager.loggers[name].enable()
+
+
+def enable_contextvars() -> None:
+    """"""
+    from .contextvars import AsyncContext
+
+    manager.context_processors.append(AsyncContext)
+
+
+def setup(
+    enable: Optional[Iterable[str]] = None,
+    disable: Optional[Iterable[str]] = None,
+    level: Optional[int] = None,
+    enable_contextvars: bool = False,
+) -> None:
+    """Convenience method to set up containerlog in a single call.
+
+    Args:
+        enable:
+        disable:
+        level:
+        enable_contextvars:
+    """
+    if enable:
+        globals()["enable"](*enable)
+    if disable:
+        globals()["disable"](*disable)
+    if level:
+        set_level(level)
+    if enable_contextvars:
+        globals()["enable_comtextvars"]()

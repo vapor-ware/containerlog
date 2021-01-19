@@ -12,11 +12,6 @@ _CTX: contextvars.ContextVar[Dict[str, Any]] = contextvars.ContextVar(
     "containerlog_ctx",
 )
 
-__all__ = [
-    "ContextVarContext",
-]
-
-
 # FIXME (etd): Do we want to have a single "context" type set for the logger or
 #   do we want to be able to support multiple kinds? e.g. use contextvars and a
 #   logger-local context. This would differentiate binding to the logger vs binding
@@ -34,32 +29,48 @@ def _get_context() -> Dict[Any, Any]:
         return _CTX.get()
 
 
-class ContextVarContext:
+def get() -> Dict[Any, Any]:
+    """"""
+
+    return _get_context()
+
+
+def bind(**kwargs: Any) -> None:
+    """"""
+
+    _get_context().update(kwargs)
+
+
+def unbind(*keys: str) -> None:
+    """"""
+
+    ctx = _get_context()
+    # FIXME (etd): pop or del? which is more performant?
+    for key in keys:
+        ctx.pop(key, None)
+
+
+def clear() -> None:
+    """"""
+
+    _get_context().clear()
+
+
+class AsyncContext:
     """"""
 
     @staticmethod
     def get() -> Dict[Any, Any]:
-        """"""
-
-        return _get_context()
+        return get()
 
     @staticmethod
     def bind(**kwargs: Any) -> None:
-        """"""
-
-        _get_context().update(kwargs)
+        bind(**kwargs)
 
     @staticmethod
     def unbind(*keys: str) -> None:
-        """"""
-
-        ctx = _get_context()
-        # FIXME (etd): pop or del? which is more performant?
-        for key in keys:
-            ctx.pop(key, None)
+        unbind(*keys)
 
     @staticmethod
     def clear() -> None:
-        """"""
-
-        _get_context().clear()
+        clear()
