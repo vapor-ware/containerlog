@@ -9,8 +9,13 @@ else:
     from typing import Protocol, runtime_checkable
 
 
+__all__ = [
+    "ContextProcessor",
+]
+
+
 @runtime_checkable
-class Context(Protocol):
+class ContextProcessor(Protocol):
     """"""
 
     def get(self) -> Dict[Any, Any]:
