@@ -555,7 +555,7 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "pyperf"
-version = "2.1.0"
+version = "2.2.0"
 description = "Python module to run and analyze benchmarks"
 category = "dev"
 optional = false
@@ -725,7 +725,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6.1"
-content-hash = "55540d2ff6760d4aa8c1c92d4e5b61401a8b5d1f1a361a04f2acb03e9a2498e7"
+content-hash = "17e9d0936b7a5565245926e67ebb6ca9397836b4be3ee50685d44be2ee3599b0"
 
 [metadata.files]
 appdirs = [
@@ -1152,8 +1152,8 @@ pyparsing = [
     {file = "pyparsing-2.4.7.tar.gz", hash = "sha256:c203ec8783bf771a155b207279b9bccb8dea02d8f0c9e5f8ead507bc3246ecc1"},
 ]
 pyperf = [
-    {file = "pyperf-2.1.0-py2.py3-none-any.whl", hash = "sha256:ca7f13c922e6a16ce2d69ac86b243c8faf5183da5b346eb064385e0de4d8c18d"},
-    {file = "pyperf-2.1.0.tar.gz", hash = "sha256:1257d673d89fdcdbaec8077afeb365e7a94739c1b263572b09403cac25708ad3"},
+    {file = "pyperf-2.2.0-py2.py3-none-any.whl", hash = "sha256:d148650ebb99f7073b5b9cbe77c86094536095a19e5c546b268ad3b64708dc86"},
+    {file = "pyperf-2.2.0.tar.gz", hash = "sha256:498bb4d1fe21350c2b7c1aa8bb3eae9c9979358d0b66327954bc66839fcba8b6"},
 ]
 pytest = [
     {file = "pytest-6.2.2-py3-none-any.whl", hash = "sha256:b574b57423e818210672e07ca1fa90aaf194a4f63f3ab909a2c67ebb22913839"},
