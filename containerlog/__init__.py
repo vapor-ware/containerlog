@@ -11,7 +11,9 @@ import inspect
 import io
 import sys
 import traceback
-from typing import Dict, Optional
+from typing import Dict, Iterable, List, Optional
+
+from .types import ContextProcessor, EventContext
 
 # Project attributes
 __title__ = "containerlog"
@@ -54,6 +56,7 @@ class Logger:
         "utcnow",
         "writeout",
         "writeerr",
+        "context_processors",
         "_previous_level",
     )
 
@@ -66,10 +69,17 @@ class Logger:
         "critical",
     )
 
-    def __init__(self, name: str, level: Optional[int] = None) -> None:
+    def __init__(
+        self,
+        name: str,
+        level: Optional[int] = None,
+        processors: Optional[Iterable[ContextProcessor]] = None,
+    ) -> None:
         self.name: str = name
         self.level: int = DEBUG if level is None else level
         self._previous_level: Optional[int] = None
+
+        self.context_processors: Iterable[ContextProcessor] = processors or []
 
         # Proxy module functions being used into the class scope. This
         # speeds things up by making what would otherwise be a LOAD_GLOBAL
@@ -138,6 +148,12 @@ class Logger:
             kwargs["_event"] = kwargs["event"]
             del kwargs["event"]
 
+        fields: EventContext = {}
+        for processor in self.context_processors:
+            processor.merge(fields)
+
+        fields.update(kwargs)
+
         # For extra kv items, if the value is a string, wrap it in single quotes.
         # Otherwise let the object's __str__ or __repr__ deal with it.
         def fmt_val(v):
@@ -146,7 +162,7 @@ class Logger:
             return v
 
         # Format the log message entry.
-        extras = " ".join(f"{k}={fmt_val(v)}" for k, v in kwargs.items())
+        extras = " ".join(f"{k}={fmt_val(v)}" for k, v in fields.items())
         entry = f"timestamp='{self.utcnow().isoformat('T')}Z' logger='{self.name}' level='{self._level_lookup[loglevel]}' event='{msg}' {extras}\n"  # noqa
 
         if exc:
@@ -241,11 +257,14 @@ class Manager:
     __slots__ = (
         "level",
         "loggers",
+        "context_processors",
     )
 
     def __init__(self, level: int = DEBUG) -> None:
         self.level: int = level
         self.loggers: Dict[str, Logger] = {}
+
+        self.context_processors: List[ContextProcessor] = []
 
     def set_levels(self) -> None:
         """Set the log level for each tracked logger."""
@@ -321,6 +340,7 @@ def get_logger(name: Optional[str] = None) -> Logger:
         logger = Logger(
             name=name,
             level=manager.level,
+            processors=manager.context_processors,
         )
         manager.loggers[name] = logger
 
@@ -385,3 +405,40 @@ def enable(*loggers: str) -> None:
             filtered = fnmatch.filter(manager.loggers.keys(), glob)
             for name in filtered:
                 manager.loggers[name].enable()
+
+
+def enable_contextvars() -> None:
+    """Enable usage of the contextvar processor for the configured logger(s)."""
+
+    try:
+        from . import contextvars
+    except ImportError as exc:
+        raise RuntimeError(
+            "unable to import contextvars, are you running with Python 3.7+?"
+        ) from exc  # pragma: nocover
+
+    manager.context_processors.append(contextvars.Processor())
+
+
+def setup(
+    enable: Optional[Iterable[str]] = None,
+    disable: Optional[Iterable[str]] = None,
+    level: Optional[int] = None,
+    with_contextvars: bool = False,
+) -> None:
+    """Convenience method to set up containerlog in a single call.
+
+    Args:
+        enable: The string or glob-names of the loggers to enable.
+        disable: The string or glob-names of the loggers to disable.
+        level: The log level to set.
+        with_contextvars: Enable the contextvar processor for the configured logger(s).
+    """
+    if enable:
+        globals()["enable"](*enable)
+    if disable:
+        globals()["disable"](*disable)
+    if level:
+        set_level(level)
+    if with_contextvars:
+        globals()["enable_contextvars"]()

@@ -5,6 +5,8 @@ import logging
 
 import pyperf
 
+NOT_SUPPORTED = 999999999
+
 
 class Custom:
     def __init__(self):
@@ -197,6 +199,11 @@ def bench_exception(loops, logger):
     return pyperf.perf_counter() - t0
 
 
+def bench_async_context(loops, logger):
+    # effectively a no-op since the std logger does not have this capability
+    return NOT_SUPPORTED
+
+
 BENCHMARKS = {
     "baseline": bench_baseline,
     "silent": bench_silent,
@@ -206,6 +213,7 @@ BENCHMARKS = {
     "short-complex": bench_short_complex,
     "long-complex": bench_long_complex,
     "exception": bench_exception,
+    "async-context": bench_async_context,
 }
 
 
