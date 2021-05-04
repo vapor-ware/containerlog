@@ -8,69 +8,83 @@ Python 3.7.
 import contextvars
 from typing import Any, Dict
 
-_CTX: contextvars.ContextVar[Dict[str, Any]] = contextvars.ContextVar(
-    "containerlog_ctx",
-)
+from .types import ContextProcessor, EventContext
 
-# FIXME (etd): Do we want to have a single "context" type set for the logger or
-#   do we want to be able to support multiple kinds? e.g. use contextvars and a
-#   logger-local context. This would differentiate binding to the logger vs binding
-#   to the contextvar in this case. Seems like it could be useful, but is it ultimately
-#   any different? Need to examine the performance of a local bind/unbind (e.g. dict?)
-#   vs bind/unbind with a contextvar
+CTXVAR_PREFIX: str = "containerlog_"
+_PREFIX_SIZE: int = len(CTXVAR_PREFIX)
+_CTXVARS: Dict[str, contextvars.ContextVar[Any]] = {}
 
 
-def _get_context() -> Dict[Any, Any]:
-    """"""
-    try:
-        return _CTX.get()
-    except LookupError:
-        _CTX.set({})
-        return _CTX.get()
+def merge(event: EventContext) -> None:
+    """Merge the contextvar state with the provided event context dict.
 
+    This mutates the event dict.
 
-def get() -> Dict[Any, Any]:
-    """"""
+    Args:
+        event: The event context to add context-local fields to.
+    """
 
-    return _get_context()
+    ctx = contextvars.copy_context()
+    for key in ctx:
+        if key.name.startswith(CTXVAR_PREFIX) and ctx[key] is not Ellipsis:
+            event.setdefault(
+                key.name[_PREFIX_SIZE:],
+                ctx[key],
+            )
 
 
 def bind(**kwargs: Any) -> None:
-    """"""
+    """Bind key-value context to the async-aware contextvar state.
 
-    _get_context().update(kwargs)
+    Args:
+        kwargs: The key-value pairs to bind as event context.
+    """
+
+    for k, v in kwargs.items():
+        key = f"{CTXVAR_PREFIX}{k}"
+        try:
+            var = _CTXVARS[key]
+        except KeyError:
+            var = contextvars.ContextVar(key, default=Ellipsis)
+            _CTXVARS[key] = var
+
+        var.set(v)
 
 
 def unbind(*keys: str) -> None:
-    """"""
+    """Unbind keys from the async-aware contextvar state.
 
-    ctx = _get_context()
-    # FIXME (etd): pop or del? which is more performant?
-    for key in keys:
-        ctx.pop(key, None)
+    Args:
+        keys: The keys of previously bound context to remove from the
+            event context.
+    """
+
+    for k in keys:
+        key = f"{CTXVAR_PREFIX}{k}"
+        if key in _CTXVARS:
+            _CTXVARS[key].set(Ellipsis)
 
 
 def clear() -> None:
-    """"""
+    """Clear contextvar state."""
 
-    _get_context().clear()
+    ctx = contextvars.copy_context()
+    for key in ctx:
+        if key.name.startswith(CTXVAR_PREFIX):
+            key.set(Ellipsis)
 
 
-class AsyncContext:
-    """"""
+class Processor(ContextProcessor):
+    """A processor to add contextvar-tracked state to log event contexts."""
 
-    @staticmethod
-    def get() -> Dict[Any, Any]:
-        return get()
+    def merge(self, event: EventContext) -> None:
+        merge(event)
 
-    @staticmethod
-    def bind(**kwargs: Any) -> None:
+    def bind(self, **kwargs: Any) -> None:
         bind(**kwargs)
 
-    @staticmethod
-    def unbind(*keys: str) -> None:
+    def unbind(self, *keys: str) -> None:
         unbind(*keys)
 
-    @staticmethod
-    def clear() -> None:
+    def clear(self) -> None:
         clear()

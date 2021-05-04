@@ -13,8 +13,7 @@ import sys
 import traceback
 from typing import Dict, Iterable, List, Optional
 
-from . import types
-from .types import ContextProcessor
+from .types import ContextProcessor, EventContext
 
 # Project attributes
 __title__ = "containerlog"
@@ -149,9 +148,9 @@ class Logger:
             kwargs["_event"] = kwargs["event"]
             del kwargs["event"]
 
-        fields = {}
+        fields: EventContext = {}
         for processor in self.context_processors:
-            fields.update(processor.get())
+            processor.merge(fields)
 
         fields.update(kwargs)
 
@@ -409,25 +408,31 @@ def enable(*loggers: str) -> None:
 
 
 def enable_contextvars() -> None:
-    """"""
-    from .contextvars import AsyncContext
+    """Enable usage of the contextvar processor for the configured logger(s)."""
 
-    manager.context_processors.append(AsyncContext)
+    try:
+        from . import contextvars
+    except ImportError as exc:
+        raise RuntimeError(
+            "unable to import contextvars, are you running with Python 3.7+?"
+        ) from exc  # pragma: nocover
+
+    manager.context_processors.append(contextvars.Processor())
 
 
 def setup(
     enable: Optional[Iterable[str]] = None,
     disable: Optional[Iterable[str]] = None,
     level: Optional[int] = None,
-    enable_contextvars: bool = False,
+    with_contextvars: bool = False,
 ) -> None:
     """Convenience method to set up containerlog in a single call.
 
     Args:
-        enable:
-        disable:
-        level:
-        enable_contextvars:
+        enable: The string or glob-names of the loggers to enable.
+        disable: The string or glob-names of the loggers to disable.
+        level: The log level to set.
+        with_contextvars: Enable the contextvar processor for the configured logger(s).
     """
     if enable:
         globals()["enable"](*enable)
@@ -435,5 +440,5 @@ def setup(
         globals()["disable"](*disable)
     if level:
         set_level(level)
-    if enable_contextvars:
-        globals()["enable_comtextvars"]()
+    if with_contextvars:
+        globals()["enable_contextvars"]()

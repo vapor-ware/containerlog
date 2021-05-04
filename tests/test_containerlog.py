@@ -1,5 +1,7 @@
 """Unit tests for containerlog."""
 
+from unittest import mock
+
 import pytest
 
 import containerlog
@@ -241,6 +243,22 @@ class TestLogger:
 
         assert o.getvalue() == out
         assert e.getvalue() == err
+
+    def test_log_with_processor(self, test_logger):
+        logger, o, e = test_logger
+
+        class DummyProcessor:
+            def merge(self, event):
+                event["foo"] = "bar"
+
+        logger.context_processors = [DummyProcessor()]
+        logger._log(containerlog.INFO, "test")
+
+        assert (
+            o.getvalue()
+            == "timestamp='2020-01-01T00:00:00Z' logger='test' level='info' event='test' foo='bar'\n"
+        )
+        assert e.getvalue() == ""
 
     def test_trace(self, test_logger):
         logger, o, e = test_logger
@@ -499,3 +517,34 @@ def test_enable_all():
     assert loggers["foo.bar"].disabled is False
     assert loggers["other"].level == containerlog.DEBUG
     assert loggers["other"].disabled is False
+
+
+def test_enable_contextvars():
+
+    assert len(containerlog.manager.context_processors) == 0
+    containerlog.enable_contextvars()
+    assert len(containerlog.manager.context_processors) == 1
+
+
+@mock.patch("containerlog.enable")
+@mock.patch("containerlog.disable")
+@mock.patch("containerlog.set_level")
+@mock.patch("containerlog.enable_contextvars")
+def test_setup(
+    mock_ctxvars: mock.Mock,
+    mock_set_level: mock.Mock,
+    mock_disable: mock.Mock,
+    mock_enable: mock.Mock,
+) -> None:
+
+    containerlog.setup(
+        enable=["foo"],
+        disable=["bar"],
+        level=containerlog.DEBUG,
+        with_contextvars=True,
+    )
+
+    mock_enable.assert_called_once_with("foo")
+    mock_disable.assert_called_once_with("bar")
+    mock_set_level.assert_called_once_with(containerlog.DEBUG)
+    mock_ctxvars.assert_called_once()
