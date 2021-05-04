@@ -5,6 +5,7 @@ import io
 import pyperf
 
 import containerlog
+from containerlog import contextvars as logctx
 
 
 class Custom:
@@ -195,6 +196,32 @@ def bench_exception(loops, logger):
     return pyperf.perf_counter() - t0
 
 
+def bench_async_context(loops, logger):
+    # use fast local vars
+    m = MSG_FORMATTED
+    args = LONG_ARGS_SIMPLE
+    range_loops = range(loops)
+    t0 = pyperf.perf_counter()
+
+    logctx.bind(testing=True, value="foo")
+
+    for _ in range_loops:
+        logger.warning(m, **args)
+        logger.warning(m, **args)
+        logger.warning(m, **args)
+        logger.warning(m, **args)
+        logger.warning(m, **args)
+        logger.warning(m, **args)
+        logger.warning(m, **args)
+        logger.warning(m, **args)
+        logger.warning(m, **args)
+        logger.warning(m, **args)
+
+    logctx.clear()
+
+    return pyperf.perf_counter() - t0
+
+
 BENCHMARKS = {
     "baseline": bench_baseline,
     "silent": bench_silent,
@@ -204,6 +231,7 @@ BENCHMARKS = {
     "short-complex": bench_short_complex,
     "long-complex": bench_long_complex,
     "exception": bench_exception,
+    "async-context": bench_async_context,
 }
 
 
