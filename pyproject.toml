@@ -39,6 +39,7 @@ pytest = "^6.2.4"
 mypy = "^0.812"
 pre-commit = "^2.13.0"
 isort = "^5.8.0"
+pytest-asyncio = "^0.15.1"
 
 [tool.isort]
 profile = "black"

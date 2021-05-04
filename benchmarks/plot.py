@@ -56,6 +56,12 @@ def normalize_data(data: List[str]) -> Dict[str, Tuple[float, float]]:
             pass
         elif mean_unit == "us":
             mean_val *= 1000
+        elif mean_unit == "sec":
+            if mean_val == 40000000:
+                # This is indicative of the NOT_SUPPORTED value being returned.
+                mean_val = 0
+            else:
+                raise ValueError("got time in seconds -- this does not seem correct; failing")
         else:
             raise ValueError(f'unsupported unit for mean while converting to ns: "{mean_unit}"')
 
@@ -64,6 +70,12 @@ def normalize_data(data: List[str]) -> Dict[str, Tuple[float, float]]:
             pass
         elif stddev_unit == "us":
             stddev_val *= 1000
+        elif stddev_unit == "sec":
+            if mean_val == 0:
+                # This was set above -- we are in the NOT_SUPPORTED state.
+                stddev_val = 0
+            else:
+                raise ValueError("got stddev in seconds -- something looks wrong here")
         else:
             raise ValueError(f'unsupported unit for stddev while converting to ns: "{stddev_unit}"')
 
