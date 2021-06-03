@@ -25,7 +25,7 @@ lint:  ## Run linting checks on the project source code
 	poetry check
 
 test:  ## Run the project unit tests
-	poetry run pytest -s -vv --cov-report html --cov-report term-missing --cov-fail-under 95 --cov containerlog
+	poetry run pytest -s -vv --cov-report html --cov-report term-missing --cov containerlog
 
 version:  ## Print the package version
 	@echo "${PKG_VERSION}"
