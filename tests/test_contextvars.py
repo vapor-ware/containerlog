@@ -208,7 +208,7 @@ async def test_clear_no_binds(event_loop: asyncio.AbstractEventLoop) -> None:
 
 @pytest.mark.asyncio
 class TestProcessor:
-    @mock.patch("containerlog.contextvars.merge")
+    @mock.patch("contextvars.merge")
     async def test_merge(self, mock_merge: mock.Mock) -> None:
         """Ensure the processor proxies to the global method."""
 
@@ -216,7 +216,7 @@ class TestProcessor:
         p.merge({"a": "b"})
         mock_merge.assert_called_once_with({"a": "b"})
 
-    @mock.patch("containerlog.contextvars.bind")
+    @mock.patch("contextvars.bind")
     async def test_bind(self, mock_bind: mock.Mock) -> None:
         """Ensure the processor proxies to the global method."""
 
@@ -224,7 +224,7 @@ class TestProcessor:
         p.bind(a=1, b=2)
         mock_bind.assert_called_once_with(a=1, b=2)
 
-    @mock.patch("containerlog.contextvars.unbind")
+    @mock.patch("contextvars.unbind")
     async def test_unbind(self, mock_unbind: mock.Mock) -> None:
         """Ensure the processor proxies to the global method."""
 
@@ -232,7 +232,7 @@ class TestProcessor:
         p.unbind("a", "b")
         mock_unbind.assert_called_once_with("a", "b")
 
-    @mock.patch("containerlog.contextvars.clear")
+    @mock.patch("contextvars.clear")
     async def test_clear(self, mock_clear: mock.Mock) -> None:
         """Ensure the processor proxies to the global method."""
 
