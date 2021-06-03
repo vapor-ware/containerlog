@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "containerlog"
-version = "0.3.1"
+version = "0.4.0"
 description = "Optimized, opinionated structured logging for Python"
 authors = ["Erick Daniszewski <erick@vapor.io>"]
 license = "GPL-3.0-or-later"
