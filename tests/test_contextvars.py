@@ -206,9 +206,10 @@ async def test_clear_no_binds(event_loop: asyncio.AbstractEventLoop) -> None:
     }
 
 
+@pytest.mark.skipif(sys.version_info < (3, 8), reason="py37 does not like mocks on async")
 @pytest.mark.asyncio
-class TestProcessor:
-    @mock.patch("contextvars.merge")
+class TestProcessorAsync:
+    @mock.patch("containerlog.contextvars.merge")
     async def test_merge(self, mock_merge: mock.Mock) -> None:
         """Ensure the processor proxies to the global method."""
 
@@ -216,7 +217,7 @@ class TestProcessor:
         p.merge({"a": "b"})
         mock_merge.assert_called_once_with({"a": "b"})
 
-    @mock.patch("contextvars.bind")
+    @mock.patch("containerlog.contextvars.bind")
     async def test_bind(self, mock_bind: mock.Mock) -> None:
         """Ensure the processor proxies to the global method."""
 
@@ -224,7 +225,7 @@ class TestProcessor:
         p.bind(a=1, b=2)
         mock_bind.assert_called_once_with(a=1, b=2)
 
-    @mock.patch("contextvars.unbind")
+    @mock.patch("containerlog.contextvars.unbind")
     async def test_unbind(self, mock_unbind: mock.Mock) -> None:
         """Ensure the processor proxies to the global method."""
 
@@ -232,8 +233,42 @@ class TestProcessor:
         p.unbind("a", "b")
         mock_unbind.assert_called_once_with("a", "b")
 
-    @mock.patch("contextvars.clear")
+    @mock.patch("containerlog.contextvars.clear")
     async def test_clear(self, mock_clear: mock.Mock) -> None:
+        """Ensure the processor proxies to the global method."""
+
+        p = contextvars.Processor()
+        p.clear()
+        mock_clear.assert_called_once()
+
+
+class TestProcessorSync:
+    @mock.patch("containerlog.contextvars.merge")
+    def test_merge(self, mock_merge: mock.Mock) -> None:
+        """Ensure the processor proxies to the global method."""
+
+        p = contextvars.Processor()
+        p.merge({"a": "b"})
+        mock_merge.assert_called_once_with({"a": "b"})
+
+    @mock.patch("containerlog.contextvars.bind")
+    def test_bind(self, mock_bind: mock.Mock) -> None:
+        """Ensure the processor proxies to the global method."""
+
+        p = contextvars.Processor()
+        p.bind(a=1, b=2)
+        mock_bind.assert_called_once_with(a=1, b=2)
+
+    @mock.patch("containerlog.contextvars.unbind")
+    def test_unbind(self, mock_unbind: mock.Mock) -> None:
+        """Ensure the processor proxies to the global method."""
+
+        p = contextvars.Processor()
+        p.unbind("a", "b")
+        mock_unbind.assert_called_once_with("a", "b")
+
+    @mock.patch("containerlog.contextvars.clear")
+    def test_clear(self, mock_clear: mock.Mock) -> None:
         """Ensure the processor proxies to the global method."""
 
         p = contextvars.Processor()
