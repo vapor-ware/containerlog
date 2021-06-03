@@ -2,11 +2,17 @@
 
 import asyncio
 import random
+import sys
 from unittest import mock
 
 import pytest
 
-from containerlog import contextvars
+try:
+    from containerlog import contextvars
+except ImportError:
+    contextvars = None
+
+pytestmark = pytest.mark.skipif(sys.version_info < (3, 7), reason="contextvars requires py37+")
 
 
 @pytest.mark.asyncio
