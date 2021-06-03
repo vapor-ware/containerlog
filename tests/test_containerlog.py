@@ -1,5 +1,6 @@
 """Unit tests for containerlog."""
 
+import sys
 from unittest import mock
 
 import pytest
@@ -519,6 +520,7 @@ def test_enable_all():
     assert loggers["other"].disabled is False
 
 
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="contextvars requires py37+")
 def test_enable_contextvars():
 
     assert len(containerlog.manager.context_processors) == 0
