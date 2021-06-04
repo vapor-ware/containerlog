@@ -43,4 +43,4 @@ setup:
 unit-test: test
 
 pypi-release:
-	tox -e release
+	poetry publish --build -u __token__ -p "${TWINE_PASSWORD}"
