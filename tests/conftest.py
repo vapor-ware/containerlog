@@ -20,7 +20,7 @@ def test_logger():
     """Fixture to get an instance of a Logger with mocked proxy module functions."""
     err = io.StringIO()
     out = io.StringIO()
-    log = containerlog.Logger(name="test")
+    log = containerlog.Logger(name="test", manager=containerlog.manager)
 
     log.utcnow = lambda: datetime.datetime(2020, 1, 1)
     log.writeout = out.write

@@ -5,6 +5,7 @@ https://docs.python.org/3/library/contextvars.html), introduced in
 Python 3.7.
 """
 
+import contextlib
 import contextvars
 from typing import Any, Dict
 
@@ -63,6 +64,26 @@ def unbind(*keys: str) -> None:
         key = f"{CTXVAR_PREFIX}{k}"
         if key in _CTXVARS:
             _CTXVARS[key].set(Ellipsis)
+
+
+@contextlib.contextmanager
+def context_binding(**kwargs):
+    """A context manager to support binding/unbinding of key-value pairs to
+    the async-aware contextvar state.
+
+    Args:
+        kwargs: The key-value pairs to bind as event context.
+    """
+    bind(**kwargs)
+    try:
+        yield
+    finally:
+        print("•••••••••••••••••••••••")
+        print(f"unbinding: {kwargs.keys()}")
+        print("•••••••••••••••••••••••")
+        unbind(*kwargs.keys())
+
+        print(_CTXVARS)
 
 
 def clear() -> None:

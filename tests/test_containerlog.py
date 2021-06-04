@@ -21,7 +21,7 @@ class TestManager:
 
     def test_set_levels_no_loggers(self):
         manager = containerlog.Manager(level=containerlog.ERROR)
-        logger = containerlog.Logger(name="test")
+        logger = containerlog.Logger(name="test", manager=manager)
         manager.set_levels()
 
         # Verify that the manager level is ERROR
@@ -32,8 +32,8 @@ class TestManager:
         assert logger.level == containerlog.DEBUG
 
     def test_set_levels_with_loggers(self):
-        logger = containerlog.Logger(name="test")
         manager = containerlog.Manager(level=containerlog.ERROR)
+        logger = containerlog.Logger(name="test", manager=manager)
         manager.loggers = {"test": logger}
 
         assert logger.level == containerlog.DEBUG
@@ -47,19 +47,21 @@ class TestManager:
 
 class TestLogger:
     def test_init(self):
-        logger = containerlog.Logger(name="test", level=containerlog.INFO)
+        logger = containerlog.Logger(
+            name="test", level=containerlog.INFO, manager=containerlog.manager
+        )
         assert logger.name == "test"
         assert logger.level == containerlog.INFO
         assert logger._previous_level is None
 
     def test_init_default_level(self):
-        logger = containerlog.Logger(name="test")
+        logger = containerlog.Logger(name="test", manager=containerlog.manager)
         assert logger.name == "test"
         assert logger.level == containerlog.DEBUG
         assert logger._previous_level is None
 
     def test_disable(self):
-        logger = containerlog.Logger(name="test")
+        logger = containerlog.Logger(name="test", manager=containerlog.manager)
         assert logger.level == containerlog.DEBUG
         assert logger._previous_level is None
 
@@ -68,7 +70,7 @@ class TestLogger:
         assert logger._previous_level == containerlog.DEBUG
 
     def test_disable_already_disabled(self):
-        logger = containerlog.Logger(name="test")
+        logger = containerlog.Logger(name="test", manager=containerlog.manager)
         assert logger.level == containerlog.DEBUG
         assert logger._previous_level is None
 
@@ -92,7 +94,7 @@ class TestLogger:
         ],
     )
     def test_enable_from_disabled(self, loglevel):
-        logger = containerlog.Logger(name="test", level=loglevel)
+        logger = containerlog.Logger(name="test", level=loglevel, manager=containerlog.manager)
         assert logger.level == loglevel
         assert logger._previous_level is None
 
@@ -116,7 +118,7 @@ class TestLogger:
         ],
     )
     def test_enable_already_enabled(self, loglevel):
-        logger = containerlog.Logger(name="test", level=loglevel)
+        logger = containerlog.Logger(name="test", level=loglevel, manager=containerlog.manager)
         assert logger.level == loglevel
         assert logger._previous_level is None
 
@@ -125,11 +127,11 @@ class TestLogger:
         assert logger._previous_level is None
 
     def test_disabled_false(self):
-        logger = containerlog.Logger(name="test")
+        logger = containerlog.Logger(name="test", manager=containerlog.manager)
         assert logger.disabled is False
 
     def test_disabled_true(self):
-        logger = containerlog.Logger(name="test")
+        logger = containerlog.Logger(name="test", manager=containerlog.manager)
         logger.disable()
         assert logger.disabled is True
 
@@ -248,11 +250,14 @@ class TestLogger:
     def test_log_with_processor(self, test_logger):
         logger, o, e = test_logger
 
+        manager = containerlog.Manager()
+        logger.manager = manager
+
         class DummyProcessor:
             def merge(self, event):
                 event["foo"] = "bar"
 
-        logger.context_processors = [DummyProcessor()]
+        logger.manager.context_processors = [DummyProcessor()]
         logger._log(containerlog.INFO, "test")
 
         assert (
@@ -389,7 +394,7 @@ class TestLogger:
 
 
 def test_get_logger_existing():
-    expected = containerlog.Logger("test")
+    expected = containerlog.Logger("test", manager=containerlog.manager)
     containerlog.manager.loggers["test"] = expected
     assert len(containerlog.manager.loggers) == 1
 
@@ -423,8 +428,8 @@ def test_caller_name():
 
 def test_set_level():
     containerlog.manager.loggers = {
-        "test": containerlog.Logger("test"),
-        "foo": containerlog.Logger("foo"),
+        "test": containerlog.Logger("test", manager=containerlog.manager),
+        "foo": containerlog.Logger("foo", manager=containerlog.manager),
     }
     assert containerlog.manager.level == containerlog.DEBUG
     for logger in containerlog.manager.loggers.values():
@@ -438,10 +443,10 @@ def test_set_level():
 
 def test_disable_glob():
     loggers = {
-        "test": containerlog.Logger("test"),
-        "foo": containerlog.Logger("foo"),
-        "foo.bar": containerlog.Logger("foo.bar"),
-        "other": containerlog.Logger("other", level=99),
+        "test": containerlog.Logger("test", manager=containerlog.manager),
+        "foo": containerlog.Logger("foo", manager=containerlog.manager),
+        "foo.bar": containerlog.Logger("foo.bar", manager=containerlog.manager),
+        "other": containerlog.Logger("other", level=99, manager=containerlog.manager),
     }
 
     containerlog.manager.loggers = loggers
@@ -459,10 +464,10 @@ def test_disable_glob():
 
 def test_disable_all():
     loggers = {
-        "test": containerlog.Logger("test"),
-        "foo": containerlog.Logger("foo"),
-        "foo.bar": containerlog.Logger("foo.bar"),
-        "other": containerlog.Logger("other", level=99),
+        "test": containerlog.Logger("test", manager=containerlog.manager),
+        "foo": containerlog.Logger("foo", manager=containerlog.manager),
+        "foo.bar": containerlog.Logger("foo.bar", manager=containerlog.manager),
+        "other": containerlog.Logger("other", level=99, manager=containerlog.manager),
     }
 
     containerlog.manager.loggers = loggers
@@ -480,10 +485,12 @@ def test_disable_all():
 
 def test_enable_glob():
     loggers = {
-        "test": containerlog.Logger("test", level=99),
-        "foo": containerlog.Logger("foo", level=99),
-        "foo.bar": containerlog.Logger("foo.bar", level=containerlog.INFO),
-        "other": containerlog.Logger("other", level=99),
+        "test": containerlog.Logger("test", level=99, manager=containerlog.manager),
+        "foo": containerlog.Logger("foo", level=99, manager=containerlog.manager),
+        "foo.bar": containerlog.Logger(
+            "foo.bar", level=containerlog.INFO, manager=containerlog.manager
+        ),
+        "other": containerlog.Logger("other", level=99, manager=containerlog.manager),
     }
 
     containerlog.manager.loggers = loggers
@@ -501,10 +508,12 @@ def test_enable_glob():
 
 def test_enable_all():
     loggers = {
-        "test": containerlog.Logger("test", level=99),
-        "foo": containerlog.Logger("foo", level=99),
-        "foo.bar": containerlog.Logger("foo.bar", level=containerlog.INFO),
-        "other": containerlog.Logger("other", level=99),
+        "test": containerlog.Logger("test", level=99, manager=containerlog.manager),
+        "foo": containerlog.Logger("foo", level=99, manager=containerlog.manager),
+        "foo.bar": containerlog.Logger(
+            "foo.bar", level=containerlog.INFO, manager=containerlog.manager
+        ),
+        "other": containerlog.Logger("other", level=99, manager=containerlog.manager),
     }
 
     containerlog.manager.loggers = loggers
