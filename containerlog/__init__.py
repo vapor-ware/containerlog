@@ -52,11 +52,11 @@ class Logger:
 
     __slots__ = (
         "name",
+        "manager",
         "level",
         "utcnow",
         "writeout",
         "writeerr",
-        "context_processors",
         "_previous_level",
     )
 
@@ -72,14 +72,13 @@ class Logger:
     def __init__(
         self,
         name: str,
+        manager: "Manager",
         level: Optional[int] = None,
-        processors: Optional[Iterable[ContextProcessor]] = None,
     ) -> None:
         self.name: str = name
         self.level: int = DEBUG if level is None else level
         self._previous_level: Optional[int] = None
-
-        self.context_processors: Iterable[ContextProcessor] = processors or []
+        self.manager: Manager = manager
 
         # Proxy module functions being used into the class scope. This
         # speeds things up by making what would otherwise be a LOAD_GLOBAL
@@ -149,7 +148,7 @@ class Logger:
             del kwargs["event"]
 
         fields: EventContext = {}
-        for processor in self.context_processors:
+        for processor in self.manager.context_processors:
             processor.merge(fields)
 
         fields.update(kwargs)
@@ -340,7 +339,7 @@ def get_logger(name: Optional[str] = None) -> Logger:
         logger = Logger(
             name=name,
             level=manager.level,
-            processors=manager.context_processors,
+            manager=manager,
         )
         manager.loggers[name] = logger
 

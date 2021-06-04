@@ -174,6 +174,67 @@ async def test_unbind_non_bound_key(event_loop: asyncio.AbstractEventLoop) -> No
 
 
 @pytest.mark.asyncio
+async def test_context_binding(event_loop: asyncio.AbstractEventLoop) -> None:
+    """Bind and unbind data within a contextmanager when no error is raised."""
+
+    event = {"a": 1}
+
+    async def coro():
+        with contextvars.context_binding(b=2):
+            contextvars.merge(event)
+
+            assert event == {
+                "a": 1,
+                "b": 2,
+            }
+            assert "containerlog_b" in contextvars._CTXVARS
+            assert contextvars._CTXVARS["containerlog_b"].get() == 2
+
+    await event_loop.create_task(coro())
+
+    # The event was merged so it still holds the value set at merge time.
+    assert event == {
+        "a": 1,
+        "b": 2,
+    }
+    # The contextvar should still exist, but should now be an ellipsis
+    assert "containerlog_b" in contextvars._CTXVARS
+    assert contextvars._CTXVARS["containerlog_b"].get() is Ellipsis
+
+
+@pytest.mark.asyncio
+async def test_context_binding_error(event_loop: asyncio.AbstractEventLoop) -> None:
+    """Bind and unbind data within a contextmanager when an error is raised."""
+
+    event = {"a": 1}
+
+    async def coro():
+        with contextvars.context_binding(b=2):
+            contextvars.merge(event)
+
+            assert event == {
+                "a": 1,
+                "b": 2,
+            }
+            assert "containerlog_b" in contextvars._CTXVARS
+            assert contextvars._CTXVARS["containerlog_b"].get() == 2
+
+            raise ValueError("test")
+
+    with pytest.raises(ValueError):
+        await event_loop.create_task(coro())
+
+        # The event was merged so it still holds the value set at merge time.
+        assert event == {
+            "a": 1,
+            "b": 2,
+        }
+        # The contextvar should still exist, but should now be an ellipsis
+        assert "containerlog_b" in contextvars._CTXVARS
+        assert contextvars._CTXVARS["containerlog_b"].get() is Ellipsis
+
+
+@pytest.mark.asyncio
 async def test_clear(event_loop: asyncio.AbstractEventLoop) -> None:
     """Clearing the context should prevent any bound context from being merged."""
 
