@@ -78,12 +78,7 @@ def context_binding(**kwargs):
     try:
         yield
     finally:
-        print("•••••••••••••••••••••••")
-        print(f"unbinding: {kwargs.keys()}")
-        print("•••••••••••••••••••••••")
         unbind(*kwargs.keys())
-
-        print(_CTXVARS)
 
 
 def clear() -> None:
