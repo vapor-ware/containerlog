@@ -180,7 +180,7 @@ python-versions = "*"
 python-dateutil = ">=2.8.1"
 
 [package.extras]
-dev = ["twine", "markdown", "flake8"]
+dev = ["twine", "markdown", "flake8", "wheel"]
 
 [[package]]
 name = "identify"
@@ -347,7 +347,7 @@ i18n = ["babel (>=2.9.0)"]
 
 [[package]]
 name = "mkdocs-material"
-version = "7.2.7"
+version = "7.3.0"
 description = "A Material Design theme for MkDocs"
 category = "dev"
 optional = false
@@ -712,7 +712,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6.1"
-content-hash = "c9da44a90bb9aa46d98879eca94960bbd3f0c6595f80d7136a784eb862367a84"
+content-hash = "08093b24c919e5a76eb3d88e63c5de0c192cfc5db14bae4604d0d6bbdb913a77"
 
 [metadata.files]
 appdirs = [
@@ -826,6 +826,7 @@ flake8-isort = [
 ]
 ghp-import = [
     {file = "ghp-import-2.0.1.tar.gz", hash = "sha256:753de2eace6e0f7d4edfb3cce5e3c3b98cd52aadb80163303d1d036bda7b4483"},
+    {file = "ghp_import-2.0.1-py3-none-any.whl", hash = "sha256:8241a8e9f8dd3c1fafe9696e6e081b57a208ef907e9939c44e7415e407ab40ea"},
 ]
 identify = [
     {file = "identify-2.2.7-py2.py3-none-any.whl", hash = "sha256:92d6ad08eca19ceb17576733759944b94c0761277ddc3acf65e75e57ef190e32"},
@@ -990,8 +991,8 @@ mkdocs = [
     {file = "mkdocs-1.2.2.tar.gz", hash = "sha256:a334f5bd98ec960638511366eb8c5abc9c99b9083a0ed2401d8791b112d6b078"},
 ]
 mkdocs-material = [
-    {file = "mkdocs-material-7.2.7.tar.gz", hash = "sha256:2ce49ece52fc92a9728ea4a3aea941744bfe23442814a1e1db93368f858aee30"},
-    {file = "mkdocs_material-7.2.7-py2.py3-none-any.whl", hash = "sha256:4be317aa17829746d9e36150207c5c6311fb82042dbd0a56ae2a3301a351fda1"},
+    {file = "mkdocs-material-7.3.0.tar.gz", hash = "sha256:07db0580fa96c3473aee99ec3fb4606a1a5a1e4f4467e64c0cd1ba8da5b6476e"},
+    {file = "mkdocs_material-7.3.0-py2.py3-none-any.whl", hash = "sha256:b183c27dc0f44e631bbc32c51057f61a3e2ba8b3c1080e59f944167eeba9ff1d"},
 ]
 mkdocs-material-extensions = [
     {file = "mkdocs-material-extensions-1.0.1.tar.gz", hash = "sha256:6947fb7f5e4291e3c61405bad3539d81e0b3cd62ae0d66ced018128af509c68f"},
